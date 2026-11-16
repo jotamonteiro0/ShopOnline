@@ -1,4 +1,4 @@
 id;nome;descricao;preco;estoque;promocaoVip
-P01;Notebook Gamer;Notebook Ryzen 7 16GB SSD 512GB;4500.00;5;true
-P02;Mouse Sem Fio;Mouse Óptico 1600 DPI;80.00;3;false
+P01;Notebook Gamer;Notebook Ryzen 7 16GB SSD 512GB;4500.00;4;true
+P02;Mouse Sem Fio;Mouse Óptico 1600 DPI;80.00;2;false
 P03;Teclado Mecânico;Teclado RGB Switch Blue;250.00;15;true
