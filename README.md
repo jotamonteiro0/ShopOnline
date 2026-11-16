@@ -57,6 +57,7 @@ ShopOnline/
 │   ├── cupons.csv                      # Cupons cadastrados e controle de uso
 │   └── pedidos.csv                     # Historico consolidado de pedidos
 ├── docs/                               # Documentacao de apoio
+│   ├── Guia_Geral_Equipe_ShopOnline.pdf # Guia completo da equipe (prazos, divisoes e regras)
 │   ├── Divisao_Tarefas_P2.pdf          # PDF oficial de distribuicao de tarefas
 │   └── CHECKLIST_DEV_JOAO.md           # Guia de verificacao do modulo do Joao
 ├── relatorio/                          # Documentacao academica para a entrega
@@ -152,6 +153,7 @@ Os arquivos sao armazenados em formato CSV compartilhado, com as seguintes regra
 
 ## 8. Documentacao Academica
 
+* [Guia Geral da Equipe (PDF)](file:///home/joaomonteiro/Documents/Engenharia%20de%20Software/2%C2%B0%20Per%C3%ADodo/Programa%20Orientada%20a%20Objetos/ShopOnline/docs/Guia_Geral_Equipe_ShopOnline.pdf)
 * [Relatorio de Decisoes de Projeto](file:///home/joaomonteiro/Documents/Engenharia%20de%20Software/2%C2%B0%20Per%C3%ADodo/Programa%20Orientada%20a%20Objetos/ShopOnline/relatorio/relatorio-decisoes.md)
 * [Relatorio Tecnico da P2](file:///home/joaomonteiro/Documents/Engenharia%20de%20Software/2%C2%B0%20Per%C3%ADodo/Programa%20Orientada%20a%20Objetos/ShopOnline/relatorio/relatorio-tecnico.md)
 * [PDF de Divisao de Tarefas](file:///home/joaomonteiro/Documents/Engenharia%20de%20Software/2%C2%B0%20Per%C3%ADodo/Programa%20Orientada%20a%20Objetos/ShopOnline/docs/Divisao_Tarefas_P2.pdf)
