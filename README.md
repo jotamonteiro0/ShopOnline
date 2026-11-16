@@ -1,145 +1,157 @@
-# Trabalho Prático — Programação Orientada a Objetos (P2)
+# Trabalho Pratico - Programacao Orientada a Objetos (P2)
 
-Implementação do sistema de comércio eletrônico **ShopOnline**, aplicando os princípios fundamentais da Orientação a Objetos (Abstração, Encapsulamento, Herança e Polimorfismo), persistência em arquivos CSV, tratamento de exceções e boas práticas de arquitetura.
+Implementacao do sistema de comercio eletronico ShopOnline, aplicando os principios fundamentais da Orientacao a Objetos (Abstracao, Encapsulamento, Heranca e Polimorfismo), persistencia em arquivos CSV, tratamento de excecoes e boas praticas de arquitetura.
 
-**iCEV — Instituto de Ensino Superior** · Engenharia de Software, 2º Período  
-Avaliação P2 · Prof. Samuel Oliveira (`samuel.oliveira@grupocev.com`)  
-Apresentações: **23 e 26 de Novembro de 2026**
+iCEV - Instituto de Ensino Superior - Engenharia de Software, 2o Periodo  
+Avaliacao P2 - Prof. Samuel Oliveira (samuel.oliveira@grupocev.com)  
+Meta de Conclusao da Equipe: Sexta-feira, 20 de Novembro de 2026  
+Apresentacoes: 23 e 26 de Novembro de 2026
 
 ---
 
-## Equipe e Divisão de Trabalho
+## 1. Equipe e Divisao de Trabalho
 
-| Integrante | Branch | Módulos e Responsabilidades |
+| Integrante | Branch | Modulos e Responsabilidades |
 | :--- | :--- | :--- |
-| **João Guilherme Monteiro** | `dev_joao` | Catálogo de Produtos, Estoque (baixa e alerta < 5 un.), Persistência CSV e Tratamento de Erros. |
-| **Maria Vitória Salgado** | `dev_vitoria` | Modelagem de Clientes e VIP (Herança), Sistema de Pontuação e Programa de Cashback. |
-| **Lucas Silva** | `dev_lucas` | Carrinho, Pedidos, Cupons de Desconto, Pagamentos (Polimorfismo) e Relatório de Vendas. |
+| **Joao Guilherme Monteiro** | `dev_joao` | Catalogo de Produtos, Estoque (baixa automatica e alerta < 5 un.), Persistencia CSV e Tratamento de Erros. |
+| **Maria Vitoria Salgado** | `dev_vitoria` | Modelagem de Clientes e VIP (Heranca), Sistema de Pontuacao e Programa de Cashback. |
+| **Lucas Silva** | `dev_lucas` | Carrinho, Pedidos, Cupons de Desconto, Pagamentos (Polimorfismo) e Relatorio de Vendas. |
 
 ---
 
-## 🚀 Como Executar
+## 2. Como Executar
 
-O projeto foi construído utilizando **exclusivamente a biblioteca padrão do Java**, sem necessidade de Maven, Gradle ou bibliotecas externas.
+O projeto foi construido utilizando exclusivamente a biblioteca padrao do Java, sem necessidade de Maven, Gradle ou bibliotecas externas.
 
-### Execução Rápida (Scripts)
+### Execucao Rapida (Scripts)
 
 ```bash
 ./run.sh          # Linux e macOS
 run.bat           # Windows
 ```
 
-### Execução Manual via Terminal
+### Execucao Manual via Terminal
 
 ```bash
 # Compilar todos os arquivos Java
 mkdir -p out
 find src -name "*.java" -print0 | xargs -0 javac -d out
 
-# Executar a aplicação
+# Executar a aplicacao
 java -cp out Main
 ```
 
-**Requisitos:** JDK 17 ou superior instalado (testado e homologado no OpenJDK 21).
+**Requisitos:** JDK 17 ou superior instalado (testado e homologado no OpenJDK 21 e OpenJDK 26).
 
 ---
 
-## Estrutura do Repositório
+## 3. Estrutura do Repositorio
 
 ```
 ShopOnline/
-├── data/                               # Fonte única de dados persistidos em CSV
-│   ├── produtos.csv                    # Inventário e controle de estoque
+├── .idea/                              # Configuracoes do projeto no IntelliJ IDEA
+├── ShopOnline.iml                      # Modulo Java do IntelliJ IDEA
+├── data/                               # Fonte unica de dados persistidos em CSV
+│   ├── produtos.csv                    # Inventario e controle de estoque
 │   ├── clientes.csv                    # Clientes, pontos e saldos de cashback
 │   ├── cupons.csv                      # Cupons cadastrados e controle de uso
-│   └── pedidos.csv                     # Histórico consolidado de pedidos
-├── docs/                               # Documentação de apoio
-│   └── Divisao_Tarefas_P2.pdf          # PDF oficial de distribuição de tarefas
-├── relatorio/                          # Documentação acadêmica para a entrega
-│   ├── relatorio-decisoes.md           # Registro formal das decisões de arquitetura OO
-│   └── relatorio-tecnico.md            # Relatório técnico completo (4+ páginas)
-├── src/                                # Código-fonte da aplicação Java
+│   └── pedidos.csv                     # Historico consolidado de pedidos
+├── docs/                               # Documentacao de apoio
+│   ├── Divisao_Tarefas_P2.pdf          # PDF oficial de distribuicao de tarefas
+│   └── CHECKLIST_DEV_JOAO.md           # Guia de verificacao do modulo do Joao
+├── relatorio/                          # Documentacao academica para a entrega
+│   ├── relatorio-decisoes.md           # Registro formal das decisoes de arquitetura OO
+│   └── relatorio-tecnico.md            # Relatorio tecnico completo (4+ paginas)
+├── src/                                # Codigo-fonte da aplicacao Java
 │   ├── Main.java                       # Ponto de entrada, testes e fluxo demonstrativo
-│   ├── model/                          # Entidades do domínio
+│   ├── model/                          # Entidades do dominio
 │   │   ├── Cliente.java                # Modelo de cliente com carteira de cashback
-│   │   ├── ClienteVip.java             # Herança de Cliente com 10% desconto em itens VIP
+│   │   ├── ClienteVip.java             # Heranca de Cliente com 10% desconto em itens VIP
 │   │   ├── NivelFidelidade.java        # Enum (Bronze, Prata, Ouro) com percentuais
-│   │   ├── Produto.java                # Modelo com regra de alerta de reposição (< 5)
+│   │   ├── Produto.java                # Modelo com regra de alerta de reposicao (< 5)
 │   │   ├── ItemCarrinho.java           # Item associado ao carrinho com subtotal
-│   │   ├── Carrinho.java               # Agregação de itens, cupons e totalizadores
-│   │   ├── Cupom.java                  # Cupom com validação de expiração e uso único
+│   │   ├── Carrinho.java               # Agregacao de itens, cupons e totalizadores
+│   │   ├── Cupom.java                  # Cupom com validacao de expiracao e uso unico
 │   │   ├── TipoCupom.java              # Enum (PERCENTUAL ou VALOR_FIXO)
 │   │   ├── StatusPedido.java           # Enum de estados (EM_PROCESSAMENTO, ENVIADO, etc.)
 │   │   ├── Pedido.java                 # Registro definitivo e regra de cancelamento seguro
-│   │   └── pagamento/                  # Camada de pagamentos polimórficos
+│   │   └── pagamento/                  # Camada de pagamentos polimorficos
 │   │       ├── FormaPagamento.java     # Interface de contrato financeiro
-│   │       ├── PagamentoPix.java       # Implementação com 5% de desconto
-│   │       ├── PagamentoCartao.java    # Implementação em até 10x sem juros
-│   │       └── PagamentoBoleto.java    # Implementação via boleto bancário
-│   ├── repository/                     # Camada de persistência em arquivos
+│   │       ├── PagamentoPix.java       # Implementacao com 5% de desconto
+│   │       ├── PagamentoCartao.java    # Implementacao em ate 10x sem juros
+│   │       └── PagamentoBoleto.java    # Implementacao via boleto bancario
+│   ├── repository/                     # Camada de persistencia em arquivos
 │   │   ├── ProdutoRepository.java      # Leitura e escrita no produtos.csv
 │   │   └── ClienteRepository.java      # Leitura e escrita no clientes.csv
-│   └── service/                        # Camada de serviços e regras de negócio
-│       ├── EstoqueService.java         # Gestão de baixa e alerta preventivo de reposição
-│       ├── FidelidadeService.java      # Cálculo de pontos e acúmulo de saldo
-│       └── VendaService.java           # Checkout, validações e emissão de relatórios
-├── run.sh                              # Script de compilação e execução para Linux/macOS
-├── run.bat                             # Script de compilação e execução para Windows
+│   ├── service/                        # Camada de servicos e regras de negocio
+│   │   ├── EstoqueService.java         # Gestao de baixa e alerta preventivo de reposicao
+│   │   ├── FidelidadeService.java      # Calculo de pontos e acumulo de saldo
+│   │   └── VendaService.java           # Checkout, validacoes e emissao de relatorios
+│   └── teste/                          # Suites de verificacao de modulos
+│       └── VerificacaoModuloJoao.java   # Suite de testes e checklist do Joao
+├── run.sh                              # Script de compilacao e execucao para Linux/macOS
+├── run.bat                             # Script de compilacao e execucao para Windows
 └── README.md                           # Guia principal do projeto
 ```
 
 ---
 
-## Contrato dos Arquivos de Dados (`data/`)
+## 4. Contrato dos Arquivos de Dados (data/)
 
-Os arquivos são armazenados em formato CSV compartilhado, com as seguintes regras de padronização:
-* **Codificação:** UTF-8 sem BOM.
-* **Separador de campos:** Ponto e vírgula (`;`).
-* **Separador decimal:** Ponto (`.`) obrigatório para valores monetários (`4500.00`, nunca vírgula).
-* **Cabeçalho:** Fixo na linha 1 de cada arquivo.
+Os arquivos sao armazenados em formato CSV compartilhado, com as seguintes regras de padronizacao:
+* **Codificacao:** UTF-8 sem BOM.
+* **Separador de campos:** Ponto e virgula (`;`).
+* **Separador decimal:** Ponto (`.`) obrigatorio para valores monetarios (`4500.00`, nunca virgula).
+* **Cabecalho:** Fixo na linha 1 de cada arquivo.
 
-| Arquivo | Colunas | Descrição |
+| Arquivo | Colunas | Descricao |
 | :--- | :--- | :--- |
-| `produtos.csv` | `id;nome;descricao;preco;estoque;promocaoVip` | Catálogo de produtos, unidades e itens VIP. |
-| `clientes.csv` | `id;nome;email;pontos;saldoCashback;vip` | Clientes, pontuação acumulada e saldo de cashback. |
-| `cupons.csv` | `codigo;tipo;valor;dataValidade;utilizado` | Cupons cadastrados e controle de uso único. |
-| `pedidos.csv` | `id;clienteId;subtotal;desconto;totalFinal;formaPagamento;status;dataCriacao;cashbackGerado` | Histórico consolidado de pedidos e faturamento. |
+| `produtos.csv` | `id;nome;descricao;preco;estoque;promocaoVip` | Catalogo de produtos, unidades e itens VIP. |
+| `clientes.csv` | `id;nome;email;pontos;saldoCashback;vip` | Clientes, pontuacao acumulada e saldo de cashback. |
+| `cupons.csv` | `codigo;tipo;valor;dataValidade;utilizado` | Cupons cadastrados e controle de uso unico. |
+| `pedidos.csv` | `id;clienteId;subtotal;desconto;totalFinal;formaPagamento;status;dataCriacao;cashbackGerado` | Historico consolidado de pedidos e faturamento. |
 
 ---
 
-## 🧱 Princípios de POO Justificados
+## 5. Principios de POO Justificados
 
-1. **Abstração:** Isolamento das entidades do mundo real (`Produto`, `Cliente`, `Carrinho`, `Pedido`, `Cupom`) com atributos e métodos focados exclusivamente nas necessidades do e-commerce.
-2. **Encapsulamento:** Todos os atributos são privados. Métodos de manipulação contêm validações de negócio (ex.: o estoque nunca fica negativo, o saldo de cashback não pode ser alterado diretamente sem transação).
-3. **Herança:** `ClienteVip` herda de `Cliente`, estendendo seu comportamento para calcular automaticamente 10% de desconto em produtos marcados em promoção VIP.
-4. **Polimorfismo:** A interface `FormaPagamento` possui implementações concretas (`PagamentoPix`, `PagamentoCartao`, `PagamentoBoleto`). O `VendaService` efetua o cálculo final chamando `formaPagamento.calcularValorFinal(total)` sem precisar de condicionais `if/else` ou conhecer detalhes de cada bandeira.
+1. **Abstracao:** Isolamento das entidades do mundo real (`Produto`, `Cliente`, `Carrinho`, `Pedido`, `Cupom`) com atributos e metodos focados exclusivamente nas necessidades do e-commerce.
+2. **Encapsulamento:** Todos os atributos sao privados. Metodos de manipulacao contem validacoes de negocio (ex.: o estoque nunca fica negativo, o saldo de cashback nao pode ser alterado diretamente sem transacao).
+3. **Heranca:** `ClienteVip` herda de `Cliente`, estendendo seu comportamento para calcular automaticamente 10% de desconto em produtos marcados em promocao VIP.
+4. **Polimorfismo:** A interface `FormaPagamento` possui implementacoes concretas (`PagamentoPix`, `PagamentoCartao`, `PagamentoBoleto`). O `VendaService` efetua o calculo final chamando `formaPagamento.calcularValorFinal(total)` sem condicionais `if/else` ou dependencias de regras especificas de cada meio.
 
 ---
 
-## Regras de Negócio e Casos Especiais
+## 6. Regras de Negocio e Casos Especiais
 
-* **Controle de Estoque & Alerta:** Baixa automática a cada venda. Caso o saldo após a venda fique com **menos de 5 unidades**, o sistema emite automaticamente o alerta `[ALERTA DE REPOSIÇÃO]`.
-* **Cancelamento Seguro:** O cancelamento de um pedido só é autorizado se o seu status for `EM_PROCESSAMENTO`. Ao cancelar, todos os produtos são estornados imediatamente ao estoque. Pedidos já enviados ou entregues não podem ser cancelados.
+* **Controle de Estoque e Alerta:** Baixa automatica a cada venda. Caso o saldo apos a venda fique com **menos de 5 unidades**, o sistema emite automaticamente o alerta `[ALERTA DE REPOSICAO]`.
+* **Cancelamento Seguro:** O cancelamento de um pedido so e autorizado se o seu status for `EM_PROCESSAMENTO`. Ao cancelar, todos os produtos sao estornados imediatamente ao estoque. Pedidos ja enviados ou entregues nao podem ser cancelados.
 * **Programa de Fidelidade e Cashback:**
   * Compras acima de R$ 100,00 geram 1 ponto a cada R$ 10,00.
-  * Tiers: **Bronze** (até 499 pts $\rightarrow$ 2% cashback), **Prata** (500 a 1.499 pts $\rightarrow$ 5% cashback), **Ouro** (1.500+ pts $\rightarrow$ 8% cashback).
-  * O cashback acumulado fica disponível na carteira do cliente para compras futuras.
-* **Cupons:** Suporte a descontos percentuais e em valor fixo, com verificação de data de validade e controle de uso único por cliente.
+  * Faixas: **Bronze** (ate 499 pts -> 2% cashback), **Prata** (500 a 1.499 pts -> 5% cashback), **Ouro** (1.500+ pts -> 8% cashback).
+  * O cashback acumulado fica disponivel na carteira do cliente para compras futuras.
+* **Cupons:** Suporte a descontos percentuais e em valor fixo, com verificacao de data de validade e controle de uso unico por cliente.
 
 ---
 
-## Git Flow da Equipe
+## 7. Git Flow da Equipe e Cronograma (Meta: Sexta-feira, 20/11)
 
-* `main`: Código final homologado, estável para entrega e apresentação.
-* `developer`: Branch de integração onde os Pull Requests das branches individuais são testados em conjunto.
-* `dev_joao`: Desenvolvimento das features atribuídas ao João.
-* `dev_vitoria`: Desenvolvimento das features atribuídas à Vitória.
-* `dev_lucas`: Desenvolvimento das features atribuídas ao Lucas.
+* `main`: Codigo final homologado, estavel para entrega e apresentacao.
+* `developer`: Branch de integracao onde os Pull Requests das branches individuais sao testados em conjunto.
+* `dev_joao`: Desenvolvimento das features atribuidas ao Joao.
+* `dev_vitoria`: Desenvolvimento das features atribuidas a Vitoria.
+* `dev_lucas`: Desenvolvimento das features atribuidas ao Lucas.
+
+### Cronograma Fatal:
+* **Ate Quarta (18/11):** Conclusao das implementacoes individuais em cada branch.
+* **Ate Quinta (19/11):** Merges integrados na branch `developer` e realizacao de testes conjuntos.
+* **Sexta-feira (20/11):** **Finalizacao obrigatoria de todo o projeto**, merge final na `main`, fechamento do relatorio tecnico (PDF 4+ paginas) e checklist de entrega.
+* **23 e 26/11:** Apresentacoes e defesas orais.
 
 ---
 
-## Documentação Acadêmica
+## 8. Documentacao Academica
 
-* [Relatório de Decisões de Projeto](file:///home/joaomonteiro/Documents/Engenharia%20de%20Software/2%C2%B0%20Per%C3%ADodo/Programa%20Orientada%20a%20Objetos/ShopOnline/relatorio/relatorio-decisoes.md)
-* [Relatório Técnico da P2](file:///home/joaomonteiro/Documents/Engenharia%20de%20Software/2%C2%B0%20Per%C3%ADodo/Programa%20Orientada%20a%20Objetos/ShopOnline/relatorio/relatorio-tecnico.md)
-* [PDF de Divisão de Tarefas](file:///home/joaomonteiro/Documents/Engenharia%20de%20Software/2%C2%B0%20Per%C3%ADodo/Programa%20Orientada%20a%20Objetos/ShopOnline/docs/Divisao_Tarefas_P2.pdf)
+* [Relatorio de Decisoes de Projeto](file:///home/joaomonteiro/Documents/Engenharia%20de%20Software/2%C2%B0%20Per%C3%ADodo/Programa%20Orientada%20a%20Objetos/ShopOnline/relatorio/relatorio-decisoes.md)
+* [Relatorio Tecnico da P2](file:///home/joaomonteiro/Documents/Engenharia%20de%20Software/2%C2%B0%20Per%C3%ADodo/Programa%20Orientada%20a%20Objetos/ShopOnline/relatorio/relatorio-tecnico.md)
+* [PDF de Divisao de Tarefas](file:///home/joaomonteiro/Documents/Engenharia%20de%20Software/2%C2%B0%20Per%C3%ADodo/Programa%20Orientada%20a%20Objetos/ShopOnline/docs/Divisao_Tarefas_P2.pdf)
