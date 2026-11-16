@@ -8,7 +8,7 @@ Apresentações: **23 e 26 de Novembro de 2026**
 
 ---
 
-## 👥 Equipe e Divisão de Trabalho
+## Equipe e Divisão de Trabalho
 
 | Integrante | Branch | Módulos e Responsabilidades |
 | :--- | :--- | :--- |
@@ -44,7 +44,7 @@ java -cp out Main
 
 ---
 
-## 📂 Estrutura do Repositório
+## Estrutura do Repositório
 
 ```
 ShopOnline/
@@ -90,7 +90,7 @@ ShopOnline/
 
 ---
 
-## 📊 Contrato dos Arquivos de Dados (`data/`)
+## Contrato dos Arquivos de Dados (`data/`)
 
 Os arquivos são armazenados em formato CSV compartilhado, com as seguintes regras de padronização:
 * **Codificação:** UTF-8 sem BOM.
@@ -116,7 +116,7 @@ Os arquivos são armazenados em formato CSV compartilhado, com as seguintes regr
 
 ---
 
-## 🎯 Regras de Negócio e Casos Especiais
+## Regras de Negócio e Casos Especiais
 
 * **Controle de Estoque & Alerta:** Baixa automática a cada venda. Caso o saldo após a venda fique com **menos de 5 unidades**, o sistema emite automaticamente o alerta `[ALERTA DE REPOSIÇÃO]`.
 * **Cancelamento Seguro:** O cancelamento de um pedido só é autorizado se o seu status for `EM_PROCESSAMENTO`. Ao cancelar, todos os produtos são estornados imediatamente ao estoque. Pedidos já enviados ou entregues não podem ser cancelados.
@@ -128,7 +128,7 @@ Os arquivos são armazenados em formato CSV compartilhado, com as seguintes regr
 
 ---
 
-## 🌿 Git Flow da Equipe
+## Git Flow da Equipe
 
 * `main`: Código final homologado, estável para entrega e apresentação.
 * `developer`: Branch de integração onde os Pull Requests das branches individuais são testados em conjunto.
@@ -138,7 +138,7 @@ Os arquivos são armazenados em formato CSV compartilhado, com as seguintes regr
 
 ---
 
-## 📄 Documentação Acadêmica
+## Documentação Acadêmica
 
 * [Relatório de Decisões de Projeto](file:///home/joaomonteiro/Documents/Engenharia%20de%20Software/2%C2%B0%20Per%C3%ADodo/Programa%20Orientada%20a%20Objetos/ShopOnline/relatorio/relatorio-decisoes.md)
 * [Relatório Técnico da P2](file:///home/joaomonteiro/Documents/Engenharia%20de%20Software/2%C2%B0%20Per%C3%ADodo/Programa%20Orientada%20a%20Objetos/ShopOnline/relatorio/relatorio-tecnico.md)
