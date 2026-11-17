@@ -4,7 +4,9 @@ subtitle: "Documentação de Engenharia e POO — Avaliação P2"
 author:
   - "João Guilherme Monteiro"
   - "Maria Vitória Salgado"
-  - "Lucas Silva"
+  - "Lucas Silveira"
+  - "Gabriel Buhatem"
+  - "Lavynne Marianne"
 date: "Teresina — PI, Novembro de 2026"
 lang: pt-BR
 ---
@@ -139,13 +141,15 @@ O armazenamento foi implementado na camada `repository` sem necessidade de bibli
 
 ---
 
-## 5. Divisão de Atividades da Equipe
+## 5. Divisão de Atividades da Equipe (5 Integrantes)
 
 | Integrante | Módulos e Funcionalidades Desenvolvidas |
 | :--- | :--- |
-| **João Guilherme Monteiro** | • Estrutura de pacotes e setup base do repositório.<br>• Modelagem de `Produto`, `EstoqueService` e alertas preventivos.<br>• Camada de persistência CSV em arquivos com sanitização de entradas.<br>• Scripts de compilação multiplataforma (`run.sh` e `run.bat`). |
-| **Maria Vitória Salgado** | • Hierarquia de clientes: `Cliente` e `ClienteVip`.<br>• Regra de negócio de fidelidade (1 ponto a cada R$ 10 em compras > R$ 100).<br>• Tiers de fidelidade: Bronze (2%), Prata (5%) e Ouro (8%).<br>• Gestão da carteira de crédito e acúmulo de saldo de cashback. |
-| **Lucas Silva** | • Modelagem do `Carrinho` e `ItemCarrinho`.<br>• Implementação de `Cupom` (percentual/fixo, expiração e uso único).<br>• Polimorfismo de pagamentos: `PagamentoPix`, `PagamentoCartao` e `PagamentoBoleto`.<br>• Regra de cancelamento seguro com estorno de estoque e relatório de vendas. |
+| **João Guilherme Monteiro** | • Estrutura de pacotes, setup base e arquitetura do repositório.<br>• Modelagem de `Produto`, `EstoqueService` e alertas preventivos (< 5 un.).<br>• Camada de persistência CSV em arquivos com sanitização de entradas.<br>• Scripts de compilação multiplataforma (`run.sh` e `run.bat`). |
+| **Maria Vitória Salgado** | • Hierarquia de clientes: `Cliente` e `ClienteVip` (herança).<br>• Validações cadastrais de integridade e persistência de clientes.<br>• Implementação de desconto exclusivo de 10% para clientes VIP em itens promocionais.<br>• Submenu do console para gestão de clientes. |
+| **Lucas Silveira** | • Modelagem do `Carrinho` e `ItemCarrinho`.<br>• Implementação de `Cupom` (% e valor fixo, expiração e uso único por cliente).<br>• Persistência de cupons em `data/cupons.csv`.<br>• Totalização de compras com múltiplos descontos aplicados. |
+| **Gabriel Buhatem** | • Polimorfismo nos pagamentos: `PagamentoPix` (5% desc.), `PagamentoCartao` (até 10x s/ juros) e `PagamentoBoleto`.<br>• Modelagem de `Pedido` e ciclo de vida (`EM_PROCESSAMENTO` -> `ENVIADO` -> `ENTREGUE`).<br>• Regra de cancelamento seguro com estorno de estoque em memória e em disco.<br>• Persistência do histórico de pedidos em `data/pedidos.csv`. |
+| **Lavynne Marianne** | • Regra de negócio de fidelidade (1 ponto a cada R$ 10 em compras > R$ 100).<br>• Tiers de fidelidade: Bronze (2%), Prata (5%) e Ouro (8%).<br>• Gestão da carteira de crédito e método `usarCashback(cliente, valor)` em compras futuras.<br>• Emissão de relatório analítico de vendas e orquestração do `MenuPrincipal`. |
 
 ---
 

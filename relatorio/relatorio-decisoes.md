@@ -4,7 +4,9 @@ subtitle: "Sistema de E-Commerce ShopOnline — Avaliação P2"
 author:
   - "João Guilherme Monteiro"
   - "Maria Vitória Salgado"
-  - "Lucas Silva"
+  - "Lucas Silveira"
+  - "Gabriel Buhatem"
+  - "Lavynne Marianne"
 date: "Teresina — PI, Novembro de 2026"
 lang: pt-BR
 ---
@@ -17,8 +19,9 @@ Disciplina: Programação Orientada a Objetos · Prof. Samuel Oliveira
 | **Disciplina** | Programação Orientada a Objetos |
 | **Professor** | Samuel Oliveira (`samuel.oliveira@grupocev.com`) |
 | **Avaliação** | Trabalho Prático da P2 |
+| **Data Limite Fatal** | Sexta-feira, 20 de novembro de 2026 |
 | **Data das Apresentações** | 23 e 26 de novembro de 2026 |
-| **Equipe** | João Guilherme Monteiro, Maria Vitória Salgado, Lucas Silva |
+| **Equipe (5 Integrantes)** | João Guilherme Monteiro, Maria Vitória Salgado, Lucas Silveira, Gabriel Buhatem, Lavynne Marianne |
 | **Repositório GitHub** | [github.com/jotamonteiro0/ShopOnline](https://github.com/jotamonteiro0/ShopOnline) |
 
 ---
@@ -94,16 +97,18 @@ public interface FormaPagamento {
 
 ---
 
-## 4. Decisão 3 — Divisão de Trabalho em Equipe
+## 4. Decisão 3 — Divisão de Trabalho em Equipe (5 Integrantes)
 
 Para evitar conflitos de merge e maximizar a autonomia, o projeto foi dividido em módulos verticais, com branches individuais no Git Flow:
 
 | Integrante | Branch | Módulos Principais | Responsabilidade & Entregáveis |
 | :--- | :--- | :--- | :--- |
-| **João Guilherme Monteiro** | `dev_joao` | Produtos, Estoque e Persistência CSV | Modelagem de `Produto`, `EstoqueService`, alerta de reposição (< 5 un.), repositórios CSV base (`ProdutoRepository`), tratamento robusto de arquivos. |
-| **Maria Vitória Salgado** | `dev_vitoria` | Clientes, VIP, Fidelidade e Cashback | Modelagem de `Cliente` e `ClienteVip`, `FidelidadeService`, regras de pontuação (R$ 10 = 1 ponto em compras > R$ 100), tiers (Bronze 2%, Prata 5%, Ouro 8%) e saldo de cashback. |
-| **Lucas Silva** | `dev_lucas` | Carrinho, Cupons, Pagamentos e Pedidos | Modelagem de `Carrinho`, `Cupom`, `StatusPedido`, `Pedido`, implementações de `FormaPagamento` (PIX, Cartão, Boleto), regra de cancelamento e relatórios de vendas. |
-| **Equipe Conjunta** | `developer` e `main` | Integração, Telas, Relatório Final e Apresentação | Menu principal de navegação, testes end-to-end integrados, elaboração do relatório técnico em PDF (mínimo de 4 páginas) e ensaio da apresentação oral. |
+| **João Guilherme Monteiro** | `dev_joao` | Produtos, Estoque e Persistência CSV Base | Modelagem de `Produto`, `EstoqueService`, alerta de reposição (< 5 un.), persistência base (`ProdutoRepository`), tratamento robusto de arquivos e arquitetura. |
+| **Maria Vitória Salgado** | `dev_vitoria` | Clientes, Especialização VIP e Validações | Modelagem de `Cliente` e `ClienteVip` (herança), validações cadastrais de integridade e persistência de clientes em `clientes.csv`. |
+| **Lucas Silveira** | `dev_lucas` | Carrinho, Cupons de Desconto e Promoções | Modelagem de `Carrinho`, `ItemCarrinho`, `Cupom`, `TipoCupom`, persistência de cupons e regra de uso único por cliente. |
+| **Gabriel Buhatem** | `dev_gabriel` | Meios de Pagamento, Ciclo de Pedidos e Cancelamento | Implementações polimórficas de `FormaPagamento` (PIX 5%, Cartão até 10x, Boleto), `Pedido`, ciclo de status e cancelamento seguro com estorno em disco. |
+| **Lavynne Marianne** | `dev_lavynne` | Fidelidade, Cashback, Relatório de Vendas e Menu | `FidelidadeService`, acúmulo e método de uso do cashback como crédito (`usarCashback`), relatórios gerenciais e organização do `MenuPrincipal`. |
+| **Equipe Conjunta** | `developer` e `main` | Integração, Testes End-to-End e Relatório Final | Testes integrados, code review, elaboração das seções individuais do Relatório Acadêmico (PDF 4+ págs) e ensaio da apresentação oral. |
 
 ---
 
@@ -139,7 +144,8 @@ O sistema implementa regras defensivas para impedir falhas de execução:
 | Etapa | Data Limite | Entregável / Ação |
 | :--- | :--- | :--- |
 | **Setup & Estrutura Base** | 16/11/2026 | Repositório criado, branches configuradas, arquitetura base e scripts operacionais. |
-| **Desenvolvimento Individual** | 20/11/2026 | Conclusão das features nas branches `dev_joao`, `dev_vitoria` e `dev_lucas`. |
-| **Integração na Branch `developer`** | 21/11/2026 | Code review, testes integrados de ponta a ponta e ajustes de interface. |
-| **Entrega Final (Repositório + PDF)** | 22/11/2026 | Merge na `main`, fechamento do relatório acadêmico de 4 páginas e envio ao professor. |
-| **Defesa Oral** | 23 e 26/11/2026 | Apresentação ao vivo do sistema em funcionamento para a banca avaliadora. |
+| **Desenvolvimento Individual (5 Branches)** | 18/11/2026 | Conclusão das features nas branches `dev_joao`, `dev_vitoria`, `dev_lucas`, `dev_gabriel` e `dev_lavynne`. |
+| **Integração na Branch `developer`** | 19/11/2026 | Pull Requests abertos, testes integrados de ponta a ponta e ajustes de interface. |
+| **Finalização e Entrega (Prazo Fatal)** | 20/11/2026 | Merge final na `main`, fechamento do relatório acadêmico de 4 páginas e checklist de entrega. |
+| **Ensaio e Revisão** | 21 e 22/11/2026 | Ensaio da apresentação oral e revisão final antes das bancas. |
+| **Defesa Oral perante a Banca** | 23 e 26/11/2026 | Apresentação ao vivo do sistema em funcionamento. |

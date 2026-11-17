@@ -9,13 +9,15 @@ Apresentacoes: 23 e 26 de Novembro de 2026
 
 ---
 
-## 1. Equipe e Divisao de Trabalho
+## 1. Equipe e Divisao de Trabalho (5 Integrantes)
 
-| Integrante | Branch | Modulos e Responsabilidades |
-| :--- | :--- | :--- |
-| **Joao Guilherme Monteiro** | `dev_joao` | Catalogo de Produtos, Estoque (baixa automatica e alerta < 5 un.), Persistencia CSV e Tratamento de Erros. |
-| **Maria Vitoria Salgado** | `dev_vitoria` | Modelagem de Clientes e VIP (Heranca), Sistema de Pontuacao e Programa de Cashback. |
-| **Lucas Silva** | `dev_lucas` | Carrinho, Pedidos, Cupons de Desconto, Pagamentos (Polimorfismo) e Relatorio de Vendas. |
+| Integrante | Branch | GitHub | Modulos e Responsabilidades |
+| :--- | :--- | :--- | :--- |
+| **Joao Guilherme Monteiro** | `dev_joao` | `@jotamonteiro0` | Catalogo de Produtos, Estoque (baixa automatica e alerta < 5 un.), Persistencia CSV base e Arquitetura. |
+| **Maria Vitoria Salgado** | `dev_vitoria` | `@vitoriasalgado` | Clientes, especializacao VIP (Heranca de ClienteVip), validacoes cadastrais e persistencia de clientes. |
+| **Lucas Silveira** | `dev_lucas` | `@lucassilveira8973` | Carrinho de compras, agregacao de itens, cupons de desconto (% e fixo, validade e uso unico por cliente). |
+| **Gabriel Buhatem** | `dev_gabriel` | `@GabrieldeAssisBuhatem` | Meios de pagamento (Polimorfismo via FormaPagamento: PIX, Cartao, Boleto), ciclo de pedidos e cancelamento restrito. |
+| **Lavynne Marianne** | `dev_lavynne` | `@lavynnemarianne13-alt` | Programa de fidelidade, carteira de cashback (acumulo e metodo usarCashback), relatorios de vendas e menu console. |
 
 ---
 
@@ -135,19 +137,23 @@ Os arquivos sao armazenados em formato CSV compartilhado, com as seguintes regra
 
 ---
 
-## 7. Git Flow da Equipe e Cronograma (Meta: Sexta-feira, 20/11)
+## 7. Git Flow da Equipe e Cronograma (Prazo Unico e Fatal: Sexta-feira, 20/11)
 
 * `main`: Codigo final homologado, estavel para entrega e apresentacao.
-* `developer`: Branch de integracao onde os Pull Requests das branches individuais sao testados em conjunto.
+* `developer`: Branch de integracao onde os Pull Requests das 5 branches individuais sao testados em conjunto.
 * `dev_joao`: Desenvolvimento das features atribuidas ao Joao.
 * `dev_vitoria`: Desenvolvimento das features atribuidas a Vitoria.
 * `dev_lucas`: Desenvolvimento das features atribuidas ao Lucas.
+* `dev_gabriel`: Desenvolvimento das features atribuidas ao Gabriel.
+* `dev_lavynne`: Desenvolvimento das features atribuidas a Lavynne.
 
 ### Cronograma Fatal:
-* **Ate Quarta (18/11):** Conclusao das implementacoes individuais em cada branch.
-* **Ate Quinta (19/11):** Merges integrados na branch `developer` e realizacao de testes conjuntos.
-* **Sexta-feira (20/11):** **Finalizacao obrigatoria de todo o projeto**, merge final na `main`, fechamento do relatorio tecnico (PDF 4+ paginas) e checklist de entrega.
-* **23 e 26/11:** Apresentacoes e defesas orais.
+* **Terca (17/11):** Todos com o projeto rodando no IntelliJ IDEA e classes base de menu/validacoes.
+* **Quarta (18/11):** Conclusao das implementacoes individuais de cada uma das 5 branches.
+* **Quinta (19/11):** Abertura de Pull Requests para a branch `developer` e bateria de testes integrados conjuntos.
+* **Sexta-feira (20/11) [PRAZO FATAL]:** Finalizacao total do projeto, merge final na `main`, fechamento do relatorio tecnico (PDF 4+ paginas) e envio oficial.
+* **21 e 22/11:** Revisao final e ensaio da apresentacao oral.
+* **23 e 26/11:** Apresentacoes e defesas orais perante a banca.
 
 ---
 
