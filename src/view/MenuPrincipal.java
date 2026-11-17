@@ -102,8 +102,11 @@ public class MenuPrincipal {
         System.out.println("     MODULO: PROGRAMA DE FIDELIDADE E RELATORIOS  ");
         System.out.println("           Responsavel: Lavynne Marianne (dev_lavynne)");
         System.out.println("==================================================");
-        System.out.println("[Informacao] A carteira de cashback e extrato analitico");
-        System.out.println("estao em desenvolvimento na branch dev_lavynne.");
+        System.out.println("\n--- Pontos, níveis e saldos de cashback ---");
+        for (Cliente cliente : clienteRepo.listarTodos()) {
+            System.out.println(cliente);
+        }
+        vendaService.exibirRelatorioVendas();
         Entrada.aguardarEnter();
     }
 
@@ -129,6 +132,13 @@ public class MenuPrincipal {
             produtoRepo.salvar(pMouse);
         }
 
+        if (pGamer.getQuantidadeEstoque() < 1 || pMouse.getQuantidadeEstoque() < 1) {
+            System.out.println("[Aviso] A demonstração precisa de 1 unidade de cada produto: P01 e P02.");
+            System.out.println("Reponha o estoque no menu de Produtos e Estoque e tente novamente.");
+            Entrada.aguardarEnter();
+            return;
+        }
+
         Carrinho carrinho = new Carrinho();
         carrinho.adicionarItem(pGamer, 1);
         carrinho.adicionarItem(pMouse, 1);
@@ -142,7 +152,11 @@ public class MenuPrincipal {
         System.out.printf("Desconto Cupom: R$ %.2f%n", carrinho.calcularDescontoCupom());
 
         FormaPagamento pagamentoPix = new PagamentoPix();
-        Pedido pedido = vendaService.finalizarPedido("PED-" + System.currentTimeMillis() % 10000, clienteVip, carrinho, pagamentoPix);
+        System.out.printf("Saldo de cashback: R$ %.2f%n", clienteVip.getSaldoCashback());
+
+        boolean usarCashback = clienteVip.getSaldoCashback() > 0
+                && Entrada.lerConfirmacao("Deseja usar o cashback nesta compra?");
+        Pedido pedido = vendaService.finalizarPedido("PED-" + System.currentTimeMillis() % 10000, clienteVip, carrinho, pagamentoPix, usarCashback);
 
         System.out.println("\nPedido Finalizado:");
         System.out.println("  " + pedido);
