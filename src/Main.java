@@ -5,15 +5,12 @@ import repository.ProdutoRepository;
 import service.EstoqueService;
 import service.FidelidadeService;
 import service.VendaService;
+import view.MenuPrincipal;
 
 import java.time.LocalDate;
 
 public class Main {
     public static void main(String[] args) {
-        System.out.println("==================================================");
-        System.out.println("     SISTEMA DE E-COMMERCE - SHOPONLINE (P2)      ");
-        System.out.println("==================================================");
-
         String caminhoProdutos = "data/produtos.csv";
         String caminhoClientes = "data/clientes.csv";
 
@@ -23,30 +20,35 @@ public class Main {
         FidelidadeService fidelidadeService = new FidelidadeService(clienteRepo);
         VendaService vendaService = new VendaService(produtoRepo, clienteRepo, estoqueService, fidelidadeService);
 
-        // Se o banco CSV estiver vazio, popula com dados de teste
+        // Se o banco CSV estiver vazio, popula com dados iniciais de teste
         if (produtoRepo.listarTodos().isEmpty()) {
-            produtoRepo.salvar(new Produto("P01", "Notebook Gamer", "Notebook Ryzen 7 16GB SSD 512GB", 4500.00, 6, true));
-            produtoRepo.salvar(new Produto("P02", "Mouse Sem Fio", "Mouse Óptico 1600 DPI", 80.00, 4, false)); // < 5 gera alerta
-            produtoRepo.salvar(new Produto("P03", "Teclado Mecânico", "Teclado RGB Switch Blue", 250.00, 15, true));
+            produtoRepo.salvar(new Produto("P01", "Notebook Gamer", "Ryzen 7 16GB SSD 512GB", 4500.00, 6, true));
+            produtoRepo.salvar(new Produto("P02", "Mouse Sem Fio", "Mouse Optico 1600 DPI", 80.00, 4, false)); // < 5 alerta
+            produtoRepo.salvar(new Produto("P03", "Teclado Mecanico", "Switch Blue RGB", 250.00, 15, true));
         }
 
         if (clienteRepo.listarTodos().isEmpty()) {
-            clienteRepo.salvar(new Cliente("C01", "João Monteiro", "joao@email.com", 600, 25.0)); // Nível Prata
-            clienteRepo.salvar(new ClienteVip("C02", "Vitória Salgado", "vitoria@email.com", 1600, 120.0)); // VIP + Ouro
-            clienteRepo.salvar(new Cliente("C03", "Lucas Silva", "lucas@email.com", 100, 0.0)); // Nível Bronze
+            clienteRepo.salvar(new Cliente("C01", "Joao Monteiro", "joao@email.com", 600, 25.0)); // Prata
+            clienteRepo.salvar(new ClienteVip("C02", "Vitoria Salgado", "vitoria@email.com", 1600, 120.0)); // VIP Ouro
+            clienteRepo.salvar(new Cliente("C03", "Lucas Silva", "lucas@email.com", 100, 0.0)); // Bronze
         }
 
-        System.out.println("\n--- Clientes Cadastrados ---");
-        for (Cliente c : clienteRepo.listarTodos()) {
-            System.out.println(c);
+        // Modo demonstracao direta se passado argumento --demo
+        if (args.length > 0 && args[0].equalsIgnoreCase("--demo")) {
+            executarDemonstracaoRapida(produtoRepo, clienteRepo, vendaService);
+            return;
         }
 
-        System.out.println("\n--- Catálogo de Produtos ---");
-        for (Produto p : produtoRepo.listarTodos()) {
-            System.out.println(p);
-        }
+        // Modo interativo padrao
+        MenuPrincipal menu = new MenuPrincipal(produtoRepo, clienteRepo, estoqueService, fidelidadeService, vendaService);
+        menu.iniciar();
+    }
 
-        System.out.println("\n--- Simulação de Compra ---");
+    private static void executarDemonstracaoRapida(ProdutoRepository produtoRepo, ClienteRepository clienteRepo, VendaService vendaService) {
+        System.out.println("==================================================");
+        System.out.println("     SISTEMA DE E-COMMERCE - SHOPONLINE (P2)      ");
+        System.out.println("==================================================");
+
         Cliente clienteVip = clienteRepo.buscarPorId("C02");
         Carrinho carrinho = new Carrinho();
 
@@ -56,21 +58,13 @@ public class Main {
         Cupom cupom = new Cupom("BEMVINDO10", TipoCupom.PERCENTUAL, 10.0, LocalDate.now().plusDays(30));
         carrinho.aplicarCupom(cupom);
 
-        System.out.println("Cliente: " + clienteVip.getNome() + " (VIP)");
-        System.out.printf("Subtotal: R$ %.2f%n", carrinho.getSubtotal());
-        System.out.printf("Desconto VIP: R$ %.2f%n", carrinho.calcularDescontoVip(clienteVip));
-        System.out.printf("Desconto Cupom: R$ %.2f%n", carrinho.calcularDescontoCupom());
-
         FormaPagamento pagamentoPix = new PagamentoPix();
         Pedido pedido = vendaService.finalizarPedido("PED-1001", clienteVip, carrinho, pagamentoPix);
 
-        System.out.println("\n--- Pedido Finalizado ---");
-        System.out.println(pedido);
+        System.out.println("\nPedido Finalizado:");
+        System.out.println("  " + pedido);
 
-        System.out.println("\n--- Relatório de Vendas ---");
+        System.out.println("\nRelatorio de Vendas:");
         vendaService.exibirRelatorioVendas();
-
-        System.out.println("\n--- Cliente após Cashback e Pontos ---");
-        System.out.println(clienteRepo.buscarPorId("C02"));
     }
 }
