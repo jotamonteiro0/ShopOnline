@@ -6,10 +6,6 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
-/**
- * Repositorio responsavel pela persistencia e consulta de produtos em arquivo CSV.
- * Implementa a interface Repositorio e garante persistencia atomica e tolerante a falhas.
- */
 public class ProdutoRepository implements Repositorio<Produto, String> {
     private static final String CABECALHO = "id;nome;descricao;preco;estoque;promocaoVip";
     private static final String DELIMITADOR = ";";

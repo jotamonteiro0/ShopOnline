@@ -10,10 +10,6 @@ import service.VendaService;
 
 import java.time.LocalDate;
 
-/**
- * Menu principal interativo do sistema ShopOnline.
- * Coordena os submenus e integra as frentes da equipe.
- */
 public class MenuPrincipal {
     private final EstoqueService estoqueService;
     private final ClienteRepository clienteRepo;

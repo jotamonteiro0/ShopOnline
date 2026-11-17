@@ -5,11 +5,6 @@ import repository.ProdutoRepository;
 
 import java.util.List;
 
-/**
- * Servico responsavel pelo controle e monitoramento do inventario e estoque da loja.
- * Aplica as regras de negocio de baixa automatica a cada venda, reposicao preventiva
- * e emissao de alertas quando o estoque restante for menor que 5 unidades.
- */
 public class EstoqueService {
     private final ProdutoRepository produtoRepository;
 
@@ -20,9 +15,6 @@ public class EstoqueService {
         this.produtoRepository = produtoRepository;
     }
 
-    /**
-     * Cadastra um novo produto no catalogo da loja com validacao de duplicidade de ID.
-     */
     public boolean cadastrarProduto(String id, String nome, String descricao, double preco, int estoqueInicial, boolean promocaoVip) {
         if (produtoRepository.existePorId(id)) {
             return false;
@@ -32,10 +24,7 @@ public class EstoqueService {
         return true;
     }
 
-    /**
-     * Executa a baixa automatica no estoque apos venda.
-     * Dispara o alerta no console caso o estoque fique abaixo de 5 unidades.
-     */
+    // Baixa automatica no estoque e alerta se menor que 5
     public boolean darBaixaEstoque(String produtoId, int quantidade) {
         if (quantidade <= 0) {
             return false;
@@ -53,9 +42,7 @@ public class EstoqueService {
         return false;
     }
 
-    /**
-     * Adiciona unidades ao estoque de um produto existente.
-     */
+    // Reposicao manual de estoque
     public boolean reporEstoque(String produtoId, int quantidade) {
         if (quantidade <= 0) {
             return false;
@@ -70,9 +57,6 @@ public class EstoqueService {
         return false;
     }
 
-    /**
-     * Consulta se um produto possui saldo suficiente para atender uma quantidade solicitada.
-     */
     public boolean temEstoqueSuficiente(String produtoId, int quantidade) {
         if (quantidade <= 0) return false;
         Produto produto = produtoRepository.buscarPorId(produtoId);
@@ -87,9 +71,7 @@ public class EstoqueService {
         return produtoRepository.listarTodos();
     }
 
-    /**
-     * Retorna a lista de produtos cujo estoque esta menor que 5 unidades.
-     */
+    // Retorna produtos com estoque baixo (< 5 unidades)
     public List<Produto> listarProdutosComAlertaReposicao() {
         return produtoRepository.listarTodos().stream()
                 .filter(Produto::precisaReposicao)

@@ -7,10 +7,6 @@ import service.EstoqueService;
 import java.io.File;
 import java.util.List;
 
-/**
- * Suite de verificacao e testes automatizados do modulo do desenvolvedor Joao Guilherme Monteiro (dev_joao).
- * Valida todas as regras de negocio de catalogo, controle de estoque, alertas preventivos e persistencia CSV.
- */
 public class VerificacaoModuloJoao {
     public static void main(String[] args) {
         System.out.println("==================================================");

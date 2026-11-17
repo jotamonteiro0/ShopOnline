@@ -5,10 +5,6 @@ import service.EstoqueService;
 
 import java.util.List;
 
-/**
- * Interface de console para a gestao de produtos e inventario da loja.
- * Modulo desenvolvido na branch dev_joao.
- */
 public class MenuProdutos {
     private final EstoqueService estoqueService;
 

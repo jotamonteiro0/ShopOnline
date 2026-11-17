@@ -2,11 +2,6 @@ package model;
 
 import java.util.Objects;
 
-/**
- * Representa um produto comercializado pela loja virtual ShopOnline.
- * Encapsula identificador, nome, descricao detalhada, preco de venda,
- * quantidade em estoque e participacao em promocao para clientes VIP.
- */
 public class Produto {
     private String id;
     private String nome;
@@ -90,20 +85,11 @@ public class Produto {
         this.promocaoVip = promocaoVip;
     }
 
-    /**
-     * Regra do enunciado: dispara alerta preventivo quando o estoque restante for menor que 5 unidades.
-     */
+    // Alerta se estoque for menor que 5 unidades
     public boolean precisaReposicao() {
         return this.quantidadeEstoque < 5;
     }
 
-    /**
-     * Realiza a baixa automatica no estoque apos venda confirmada.
-     * Impede qualquer tentativa de deixar o estoque negativo.
-     *
-     * @param quantidade Unidades a serem reduzidas
-     * @return true se a baixa foi efetuada com sucesso; false se o saldo for insuficiente
-     */
     public boolean reduzirEstoque(int quantidade) {
         if (quantidade > 0 && this.quantidadeEstoque >= quantidade) {
             this.quantidadeEstoque -= quantidade;
@@ -112,11 +98,6 @@ public class Produto {
         return false;
     }
 
-    /**
-     * Adiciona unidades ao inventario do produto (reposicao de fornecedor ou cancelamento seguro).
-     *
-     * @param quantidade Unidades a serem adicionadas
-     */
     public void adicionarEstoque(int quantidade) {
         if (quantidade > 0) {
             this.quantidadeEstoque += quantidade;

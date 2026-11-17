@@ -2,26 +2,12 @@ package view;
 
 import java.util.Scanner;
 
-/**
- * Utilitario de leitura segura do teclado via console.
- * Implementa tratamento defensivo de excecoes (try/catch) para que o sistema
- * jamais trave ou aborte por entradas invalidas, letras em campos numericos
- * ou valores fora de faixa.
- */
 public class Entrada {
     private static final Scanner scanner = new Scanner(System.in);
 
     private Entrada() {
-        // Construtor privado para classe estatica utilitaria
     }
 
-    /**
-     * Le uma linha de texto do teclado.
-     *
-     * @param rotulo Mensagem exibida para o usuario
-     * @param obrigatorio Se true, repete a solicitacao ate o usuario digitar algo valido
-     * @return O texto digitado
-     */
     public static String lerTexto(String rotulo, boolean obrigatorio) {
         while (true) {
             System.out.print(rotulo);
@@ -33,9 +19,6 @@ public class Entrada {
         }
     }
 
-    /**
-     * Le um identificador (codigo/ID) e converte automaticamente para letras maiusculas.
-     */
     public static String lerId(String rotulo) {
         while (true) {
             String id = lerTexto(rotulo, true);
@@ -46,9 +29,6 @@ public class Entrada {
         }
     }
 
-    /**
-     * Le um numero inteiro dentro de uma faixa especificada [min, max].
-     */
     public static int lerInteiro(String rotulo, int min, int max) {
         while (true) {
             System.out.print(rotulo);
@@ -65,10 +45,6 @@ public class Entrada {
         }
     }
 
-    /**
-     * Le um numero decimal (double) com valor minimo permitido.
-     * Aceita tanto ponto (.) quanto virgula (,) como separador decimal.
-     */
     public static double lerDouble(String rotulo, double min) {
         while (true) {
             System.out.print(rotulo);
@@ -80,14 +56,11 @@ public class Entrada {
                 }
                 System.out.printf("  [Aviso] O valor deve ser maior ou igual a %.2f.%n", min);
             } catch (NumberFormatException e) {
-                System.out.println("  [Aviso] Valor monetario ou numerico invalido. Digite um numero valido.");
+                System.out.println("  [Aviso] Digite um numero valido.");
             }
         }
     }
 
-    /**
-     * Le uma confirmacao booleana (S/N ou Sim/Nao).
-     */
     public static boolean lerConfirmacao(String rotulo) {
         while (true) {
             System.out.print(rotulo + " (S/N): ");
@@ -101,9 +74,6 @@ public class Entrada {
         }
     }
 
-    /**
-     * Pausa a execucao e aguarda o usuario pressionar ENTER para prosseguir.
-     */
     public static void aguardarEnter() {
         System.out.print("\nPressione ENTER para continuar...");
         scanner.nextLine();
