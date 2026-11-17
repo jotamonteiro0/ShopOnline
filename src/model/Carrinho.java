@@ -26,6 +26,27 @@ public class Carrinho {
         return itens.removeIf(item -> item.getProduto().getId().equals(produtoId));
     }
 
+    public boolean removerQuantidadeItem(String produtoId, int quantidadeParaRemover) {
+        if (produtoId == null || quantidadeParaRemover <= 0) {
+            return false;
+        }
+        for (int i = 0; i < itens.size(); i++) {
+            ItemCarrinho item = itens.get(i);
+            if (item.getProduto().getId().equalsIgnoreCase(produtoId.trim())) {
+                if (quantidadeParaRemover > item.getQuantidade()) {
+                    return false;
+                }
+                if (quantidadeParaRemover == item.getQuantidade()) {
+                    itens.remove(i);
+                } else {
+                    item.setQuantidade(item.getQuantidade() - quantidadeParaRemover);
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void limpar() {
         itens.clear();
         cupomAplicado = null;
@@ -62,6 +83,14 @@ public class Carrinho {
             return true;
         }
         return false;
+    }
+
+    public boolean aplicarCupom(Cupom cupom, Cliente cliente) {
+        if (cupom != null && cliente != null && cupom.isValidoParaCliente(cliente.getId())) {
+            this.cupomAplicado = cupom;
+            return true;
+        }
+        return aplicarCupom(cupom);
     }
 
     public Cupom getCupomAplicado() {

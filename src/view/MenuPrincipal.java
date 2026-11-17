@@ -3,6 +3,7 @@ package view;
 import model.*;
 import model.pagamento.*;
 import repository.ClienteRepository;
+import repository.CupomRepository;
 import repository.ProdutoRepository;
 import service.EstoqueService;
 import service.FidelidadeService;
@@ -20,7 +21,9 @@ public class MenuPrincipal {
     private final ProdutoRepository produtoRepo;
     private final FidelidadeService fidelidadeService;
     private final VendaService vendaService;
+    private final CupomRepository cupomRepo;
     private final MenuProdutos menuProdutos;
+    private final MenuCarrinho menuCarrinho;
 
     public MenuPrincipal(ProdutoRepository produtoRepo,
                          ClienteRepository clienteRepo,
@@ -32,7 +35,9 @@ public class MenuPrincipal {
         this.estoqueService = estoqueService;
         this.fidelidadeService = fidelidadeService;
         this.vendaService = vendaService;
+        this.cupomRepo = new CupomRepository("data/cupons.csv");
         this.menuProdutos = new MenuProdutos(estoqueService);
+        this.menuCarrinho = new MenuCarrinho(produtoRepo, clienteRepo, cupomRepo, estoqueService, vendaService);
     }
 
     public void iniciar() {
@@ -55,7 +60,7 @@ public class MenuPrincipal {
             switch (opcao) {
                 case 1 -> menuProdutos.exibirMenu();
                 case 2 -> menuClientesInfo();
-                case 3 -> menuCarrinhoInfo();
+                case 3 -> menuCarrinho.exibirMenu();
                 case 4 -> menuPedidosInfo();
                 case 5 -> menuFidelidadeInfo();
                 case 6 -> executarDemonstracao();
