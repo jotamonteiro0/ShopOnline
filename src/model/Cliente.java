@@ -8,17 +8,13 @@ public class Cliente {
     private double saldoCashback;
 
     public Cliente(String id, String nome, String email) {
-        this.id = id;
-        this.nome = nome;
-        this.email = email;
-        this.pontosFidelidade = 0;
-        this.saldoCashback = 0.0;
+        this(id, nome, email, 0, 0.0);
     }
 
     public Cliente(String id, String nome, String email, int pontosFidelidade, double saldoCashback) {
-        this.id = id;
-        this.nome = nome;
-        this.email = email;
+        this.id = validarTexto(id, "ID");
+        setNome(nome);
+        setEmail(email);
         this.pontosFidelidade = pontosFidelidade;
         this.saldoCashback = saldoCashback;
     }
@@ -32,7 +28,7 @@ public class Cliente {
     }
 
     public void setNome(String nome) {
-        this.nome = nome;
+        this.nome = validarTexto(nome, "Nome");
     }
 
     public String getEmail() {
@@ -40,7 +36,22 @@ public class Cliente {
     }
 
     public void setEmail(String email) {
+        email = validarTexto(email, "E-mail");
+        if (!email.matches("[^\\s@]+@[^\\s@]+")) {
+            throw new IllegalArgumentException("E-mail deve conter usuário e domínio separados por @, sem espaços.");
+        }
         this.email = email;
+    }
+
+    private static String validarTexto(String valor, String campo) {
+        if (valor == null || valor.isBlank()) {
+            throw new IllegalArgumentException(campo + " não pode ser vazio.");
+        }
+        // O CSV compartilhado não possui escape para separadores ou quebras de linha.
+        if (valor.contains(";") || valor.contains("\n") || valor.contains("\r")) {
+            throw new IllegalArgumentException(campo + " não pode conter ponto e vírgula ou quebra de linha.");
+        }
+        return valor.strip();
     }
 
     public int getPontosFidelidade() {
