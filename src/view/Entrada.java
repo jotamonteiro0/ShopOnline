@@ -11,6 +11,9 @@ public class Entrada {
     public static String lerTexto(String rotulo, boolean obrigatorio) {
         while (true) {
             System.out.print(rotulo);
+            if (!scanner.hasNextLine()) {
+                return "";
+            }
             String entrada = scanner.nextLine().trim();
             if (!obrigatorio || !entrada.isEmpty()) {
                 return entrada;
@@ -22,6 +25,9 @@ public class Entrada {
     public static String lerId(String rotulo) {
         while (true) {
             String id = lerTexto(rotulo, true);
+            if (id.isEmpty()) {
+                return "";
+            }
             if (id.matches("[a-zA-Z0-9_-]+")) {
                 return id.toUpperCase();
             }
@@ -32,6 +38,9 @@ public class Entrada {
     public static int lerInteiro(String rotulo, int min, int max) {
         while (true) {
             System.out.print(rotulo);
+            if (!scanner.hasNextLine()) {
+                return min;
+            }
             String entrada = scanner.nextLine().trim();
             try {
                 int valor = Integer.parseInt(entrada);
@@ -48,10 +57,13 @@ public class Entrada {
     public static double lerDouble(String rotulo, double min) {
         while (true) {
             System.out.print(rotulo);
+            if (!scanner.hasNextLine()) {
+                return min;
+            }
             String entrada = scanner.nextLine().trim().replace(',', '.');
             try {
                 double valor = Double.parseDouble(entrada);
-                if (valor >= min) {
+                if (Double.isFinite(valor) && valor >= min) {
                     return valor;
                 }
                 System.out.printf("  [Aviso] O valor deve ser maior ou igual a %.2f.%n", min);
@@ -64,6 +76,9 @@ public class Entrada {
     public static boolean lerConfirmacao(String rotulo) {
         while (true) {
             System.out.print(rotulo + " (S/N): ");
+            if (!scanner.hasNextLine()) {
+                return false;
+            }
             String entrada = scanner.nextLine().trim().toUpperCase();
             if (entrada.equals("S") || entrada.equals("SIM")) {
                 return true;
@@ -76,6 +91,8 @@ public class Entrada {
 
     public static void aguardarEnter() {
         System.out.print("\nPressione ENTER para continuar...");
-        scanner.nextLine();
+        if (scanner.hasNextLine()) {
+            scanner.nextLine();
+        }
     }
 }

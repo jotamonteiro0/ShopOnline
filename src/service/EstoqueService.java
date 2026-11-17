@@ -16,7 +16,7 @@ public class EstoqueService {
     }
 
     public boolean cadastrarProduto(String id, String nome, String descricao, double preco, int estoqueInicial, boolean promocaoVip) {
-        if (produtoRepository.existePorId(id)) {
+        if (id == null || id.trim().isEmpty() || produtoRepository.existePorId(id)) {
             return false;
         }
         Produto novoProduto = new Produto(id, nome, descricao, preco, estoqueInicial, promocaoVip);
@@ -26,7 +26,7 @@ public class EstoqueService {
 
     // Baixa automatica no estoque e alerta se menor que 5
     public boolean darBaixaEstoque(String produtoId, int quantidade) {
-        if (quantidade <= 0) {
+        if (produtoId == null || quantidade <= 0) {
             return false;
         }
 
@@ -44,7 +44,7 @@ public class EstoqueService {
 
     // Reposicao manual de estoque
     public boolean reporEstoque(String produtoId, int quantidade) {
-        if (quantidade <= 0) {
+        if (produtoId == null || quantidade <= 0) {
             return false;
         }
 
@@ -58,7 +58,7 @@ public class EstoqueService {
     }
 
     public boolean temEstoqueSuficiente(String produtoId, int quantidade) {
-        if (quantidade <= 0) return false;
+        if (produtoId == null || quantidade <= 0) return false;
         Produto produto = produtoRepository.buscarPorId(produtoId);
         return produto != null && produto.getQuantidadeEstoque() >= quantidade;
     }

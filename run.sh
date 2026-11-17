@@ -1,7 +1,4 @@
 #!/usr/bin/env bash
-# Executa a compilação e execução do ShopOnline.
-# Sem Maven, sem Gradle, sem dependências externas.
-# Testado em Linux e macOS.
 set -euo pipefail
 cd "$(dirname "$0")"
 
@@ -9,11 +6,11 @@ echo "=================================================="
 echo "    COMPILANDO PROJETO SHOPONLINE (JAVA 17+)      "
 echo "=================================================="
 mkdir -p out
-find src -name "*.java" -print0 | xargs -0 javac -d out
+find src -name "*.java" -print0 | xargs -0 javac -encoding UTF-8 -d out
 
-echo "Compilação concluída com sucesso!"
+echo "Compilacao concluida com sucesso!"
 echo
 echo "=================================================="
 echo "             INICIANDO SISTEMA                    "
 echo "=================================================="
-java -cp out Main
+java -Dfile.encoding=UTF-8 -cp out Main "$@"

@@ -129,6 +129,13 @@ public class MenuPrincipal {
             produtoRepo.salvar(pMouse);
         }
 
+        if (pGamer.getQuantidadeEstoque() < 1 || pMouse.getQuantidadeEstoque() < 1) {
+            System.out.println("[Aviso] Estoque insuficiente para rodar a demonstracao automatica (requer P01 e P02 disponiveis).");
+            System.out.println("Use a opcao 1 (Gestao de Produtos e Estoque -> Repor Estoque) e tente novamente.");
+            Entrada.aguardarEnter();
+            return;
+        }
+
         Carrinho carrinho = new Carrinho();
         carrinho.adicionarItem(pGamer, 1);
         carrinho.adicionarItem(pMouse, 1);
@@ -141,14 +148,18 @@ public class MenuPrincipal {
         System.out.printf("Desconto VIP: R$ %.2f%n", carrinho.calcularDescontoVip(clienteVip));
         System.out.printf("Desconto Cupom: R$ %.2f%n", carrinho.calcularDescontoCupom());
 
-        FormaPagamento pagamentoPix = new PagamentoPix();
-        Pedido pedido = vendaService.finalizarPedido("PED-" + System.currentTimeMillis() % 10000, clienteVip, carrinho, pagamentoPix);
+        try {
+            FormaPagamento pagamentoPix = new PagamentoPix();
+            Pedido pedido = vendaService.finalizarPedido("PED-" + System.currentTimeMillis() % 10000, clienteVip, carrinho, pagamentoPix);
 
-        System.out.println("\nPedido Finalizado:");
-        System.out.println("  " + pedido);
+            System.out.println("\nPedido Finalizado:");
+            System.out.println("  " + pedido);
 
-        System.out.println("\nRelatorio de Vendas:");
-        vendaService.exibirRelatorioVendas();
+            System.out.println("\nRelatorio de Vendas:");
+            vendaService.exibirRelatorioVendas();
+        } catch (RuntimeException e) {
+            System.out.println("\n[Erro] Nao foi possivel concluir a demonstracao: " + e.getMessage());
+        }
 
         Entrada.aguardarEnter();
     }

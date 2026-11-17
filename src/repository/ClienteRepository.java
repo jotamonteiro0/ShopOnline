@@ -2,7 +2,9 @@ package repository;
 
 import model.Cliente;
 import model.ClienteVip;
+
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class ClienteRepository {
@@ -10,6 +12,9 @@ public class ClienteRepository {
     private final Map<String, Cliente> clientes = new LinkedHashMap<>();
 
     public ClienteRepository(String caminhoArquivo) {
+        if (caminhoArquivo == null || caminhoArquivo.trim().isEmpty()) {
+            throw new IllegalArgumentException("Caminho do arquivo de clientes nao pode ser vazio.");
+        }
         this.caminhoArquivo = caminhoArquivo;
         carregarDoArquivo();
     }
@@ -19,27 +24,34 @@ public class ClienteRepository {
     }
 
     public Cliente buscarPorId(String id) {
-        return clientes.get(id);
+        if (id == null) return null;
+        String chave = id.trim();
+        Cliente direto = clientes.get(chave);
+        return direto != null ? direto : clientes.get(chave.toUpperCase());
     }
 
     public void salvar(Cliente cliente) {
-        clientes.put(cliente.getId(), cliente);
+        if (cliente == null) {
+            throw new IllegalArgumentException("Cliente nao pode ser nulo.");
+        }
+        clientes.put(cliente.getId().trim().toUpperCase(), cliente);
         salvarNoArquivo();
     }
 
-    public void carregarDoArquivo() {
+    public final void carregarDoArquivo() {
         File file = new File(caminhoArquivo);
         if (!file.exists()) {
             return;
         }
 
-        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+        clientes.clear();
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8))) {
             String linha = reader.readLine(); // Header
             while ((linha = reader.readLine()) != null) {
                 if (linha.trim().isEmpty()) continue;
-                String[] partes = linha.split(";");
+                String[] partes = linha.split(";", -1);
                 if (partes.length >= 6) {
-                    String id = partes[0].trim();
+                    String id = partes[0].trim().toUpperCase();
                     String nome = partes[1].trim();
                     String email = partes[2].trim();
                     int pontos = Integer.parseInt(partes[3].trim());
@@ -60,19 +72,21 @@ public class ClienteRepository {
         }
     }
 
-    public void salvarNoArquivo() {
+    public final void salvarNoArquivo() {
         File file = new File(caminhoArquivo);
         File parent = file.getParentFile();
         if (parent != null && !parent.exists()) {
             parent.mkdirs();
         }
 
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+        try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8))) {
             writer.write("id;nome;email;pontos;saldoCashback;vip");
             writer.newLine();
             for (Cliente c : clientes.values()) {
+                String nomeSeguro = c.getNome() != null ? c.getNome().replace(';', ',') : "";
+                String emailSeguro = c.getEmail() != null ? c.getEmail().replace(';', ',') : "";
                 writer.write(String.format(Locale.US, "%s;%s;%s;%d;%.2f;%b",
-                        c.getId(), c.getNome(), c.getEmail(),
+                        c.getId(), nomeSeguro, emailSeguro,
                         c.getPontosFidelidade(), c.getSaldoCashback(), c.isVip()));
                 writer.newLine();
             }

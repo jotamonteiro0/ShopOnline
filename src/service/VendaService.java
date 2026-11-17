@@ -25,11 +25,17 @@ public class VendaService {
     }
 
     public Pedido finalizarPedido(String pedidoId, Cliente cliente, Carrinho carrinho, FormaPagamento formaPagamento) {
-        if (carrinho.getItens().isEmpty()) {
-            throw new IllegalStateException("O carrinho está vazio.");
+        if (cliente == null) {
+            throw new IllegalArgumentException("O cliente nao pode ser nulo.");
+        }
+        if (carrinho == null || carrinho.getItens().isEmpty()) {
+            throw new IllegalStateException("O carrinho esta vazio.");
+        }
+        if (formaPagamento == null) {
+            throw new IllegalArgumentException("A forma de pagamento nao pode ser nula.");
         }
 
-        // Validação de estoque
+        // Validacao de estoque
         for (ItemCarrinho item : carrinho.getItens()) {
             Produto p = produtoRepository.buscarPorId(item.getProduto().getId());
             if (p == null || p.getQuantidadeEstoque() < item.getQuantidade()) {
@@ -40,11 +46,10 @@ public class VendaService {
         double subtotal = carrinho.getSubtotal();
         double descontoVip = carrinho.calcularDescontoVip(cliente);
         double descontoCupom = carrinho.calcularDescontoCupom();
-        double totalIntermediario = subtotal - descontoVip - descontoCupom;
+        double totalIntermediario = Math.max(0.0, subtotal - descontoVip - descontoCupom);
 
-        double valorFinal = formaPagamento.calcularValorFinal(totalIntermediario);
-        double descontoPagamento = totalIntermediario - valorFinal;
-        double descontoTotal = descontoVip + descontoCupom + Math.max(0, descontoPagamento);
+        double valorFinal = Math.max(0.0, formaPagamento.calcularValorFinal(totalIntermediario));
+        double descontoTotal = Math.max(0.0, subtotal - valorFinal);
 
         // Dar baixa no estoque
         for (ItemCarrinho item : carrinho.getItens()) {
@@ -71,9 +76,22 @@ public class VendaService {
     }
 
     public boolean cancelarPedido(String pedidoId) {
+        if (pedidoId == null) return false;
         for (Pedido p : pedidosRealizados) {
-            if (p.getId().equals(pedidoId)) {
-                return p.cancelar();
+            if (p.getId().equalsIgnoreCase(pedidoId.trim())) {
+                boolean cancelado = p.cancelar();
+                if (cancelado) {
+                    for (ItemCarrinho item : p.getItens()) {
+                        Produto prodRepo = produtoRepository.buscarPorId(item.getProduto().getId());
+                        if (prodRepo != null) {
+                            if (prodRepo != item.getProduto()) {
+                                prodRepo.adicionarEstoque(item.getQuantidade());
+                            }
+                            produtoRepository.salvar(prodRepo);
+                        }
+                    }
+                }
+                return cancelado;
             }
         }
         return false;
@@ -85,7 +103,7 @@ public class VendaService {
 
     public void exibirRelatorioVendas() {
         System.out.println("==================================================");
-        System.out.println("            RELATÓRIO GERAL DE VENDAS             ");
+        System.out.println("            RELATORIO GERAL DE VENDAS             ");
         System.out.println("==================================================");
         double receitaTotal = 0;
         int totalItensVendidos = 0;

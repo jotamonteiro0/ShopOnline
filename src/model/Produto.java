@@ -11,25 +11,33 @@ public class Produto {
     private boolean promocaoVip;
 
     public Produto(String id, String nome, String descricao, double preco, int quantidadeEstoque, boolean promocaoVip) {
-        if (id == null || id.trim().isEmpty()) {
-            throw new IllegalArgumentException("O identificador do produto nao pode ser nulo ou vazio.");
+        if (id == null || id.trim().isEmpty() || id.contains(";") || id.contains("\n") || id.contains("\r")) {
+            throw new IllegalArgumentException("O identificador do produto e invalido.");
         }
-        if (nome == null || nome.trim().isEmpty()) {
+        String nomeLimpo = limparTextoCsv(nome);
+        if (nomeLimpo.isEmpty()) {
             throw new IllegalArgumentException("O nome do produto nao pode ser nulo ou vazio.");
         }
-        if (preco < 0.0) {
-            throw new IllegalArgumentException("O preco do produto nao pode ser negativo.");
+        if (!Double.isFinite(preco) || preco < 0.0) {
+            throw new IllegalArgumentException("O preco do produto nao pode ser negativo ou invalido.");
         }
         if (quantidadeEstoque < 0) {
             throw new IllegalArgumentException("A quantidade inicial em estoque nao pode ser negativa.");
         }
 
         this.id = id.trim().toUpperCase();
-        this.nome = nome.trim();
-        this.descricao = (descricao != null) ? descricao.trim() : "";
+        this.nome = nomeLimpo;
+        this.descricao = limparTextoCsv(descricao);
         this.preco = preco;
         this.quantidadeEstoque = quantidadeEstoque;
         this.promocaoVip = promocaoVip;
+    }
+
+    private static String limparTextoCsv(String texto) {
+        if (texto == null) {
+            return "";
+        }
+        return texto.replace(';', ',').replace('\r', ' ').replace('\n', ' ').trim();
     }
 
     public String getId() {
@@ -41,10 +49,11 @@ public class Produto {
     }
 
     public void setNome(String nome) {
-        if (nome == null || nome.trim().isEmpty()) {
+        String nomeLimpo = limparTextoCsv(nome);
+        if (nomeLimpo.isEmpty()) {
             throw new IllegalArgumentException("O nome do produto nao pode ser vazio.");
         }
-        this.nome = nome.trim();
+        this.nome = nomeLimpo;
     }
 
     public String getDescricao() {
@@ -52,7 +61,7 @@ public class Produto {
     }
 
     public void setDescricao(String descricao) {
-        this.descricao = (descricao != null) ? descricao.trim() : "";
+        this.descricao = limparTextoCsv(descricao);
     }
 
     public double getPreco() {
@@ -60,8 +69,8 @@ public class Produto {
     }
 
     public void setPreco(double preco) {
-        if (preco < 0.0) {
-            throw new IllegalArgumentException("O preco nao pode ser negativo.");
+        if (!Double.isFinite(preco) || preco < 0.0) {
+            throw new IllegalArgumentException("O preco nao pode ser negativo ou invalido.");
         }
         this.preco = preco;
     }

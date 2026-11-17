@@ -14,6 +14,9 @@ public class ProdutoRepository implements Repositorio<Produto, String> {
     private final Map<String, Produto> produtos = new LinkedHashMap<>();
 
     public ProdutoRepository(String caminhoArquivo) {
+        if (caminhoArquivo == null || caminhoArquivo.trim().isEmpty()) {
+            throw new IllegalArgumentException("Caminho do arquivo de produtos nao pode ser vazio.");
+        }
         this.caminhoArquivo = caminhoArquivo;
         carregarDoArquivo();
     }
@@ -56,7 +59,7 @@ public class ProdutoRepository implements Repositorio<Produto, String> {
     }
 
     @Override
-    public void carregarDoArquivo() {
+    public final void carregarDoArquivo() {
         File file = new File(caminhoArquivo);
         if (!file.exists()) {
             salvarNoArquivo(); // Cria o arquivo inicial com o cabecalho padrao
@@ -70,7 +73,7 @@ public class ProdutoRepository implements Repositorio<Produto, String> {
             while ((linha = reader.readLine()) != null) {
                 linhaNum++;
                 if (linha.trim().isEmpty()) continue;
-                String[] partes = linha.split(DELIMITADOR);
+                String[] partes = linha.split(DELIMITADOR, -1);
                 if (partes.length >= 6) {
                     try {
                         String id = partes[0].trim();
@@ -93,7 +96,7 @@ public class ProdutoRepository implements Repositorio<Produto, String> {
     }
 
     @Override
-    public void salvarNoArquivo() {
+    public final void salvarNoArquivo() {
         File file = new File(caminhoArquivo);
         File parent = file.getParentFile();
         if (parent != null && !parent.exists()) {

@@ -56,14 +56,18 @@ public class MenuProdutos {
         int estoque = Entrada.lerInteiro("Quantidade inicial em estoque: ", 0, 10000);
         boolean vip = Entrada.lerConfirmacao("Este produto participa de promocao VIP (10% desconto)");
 
-        boolean sucesso = estoqueService.cadastrarProduto(id, nome, descricao, preco, estoque, vip);
-        if (sucesso) {
-            System.out.println("\n[Sucesso] Produto cadastrado e persistido no arquivo data/produtos.csv!");
-            if (estoque < 5) {
-                System.out.println(">>> [ALERTA DE REPOSICAO] Atencao: produto cadastrado com menos de 5 unidades!");
+        try {
+            boolean sucesso = estoqueService.cadastrarProduto(id, nome, descricao, preco, estoque, vip);
+            if (sucesso) {
+                System.out.println("\n[Sucesso] Produto cadastrado e persistido no arquivo data/produtos.csv!");
+                if (estoque < 5) {
+                    System.out.println(">>> [ALERTA DE REPOSICAO] Atencao: produto cadastrado com menos de 5 unidades!");
+                }
+            } else {
+                System.out.println("\n[Erro] Falha ao cadastrar produto.");
             }
-        } else {
-            System.out.println("\n[Erro] Falha ao cadastrar produto.");
+        } catch (IllegalArgumentException e) {
+            System.out.println("\n[Erro] " + e.getMessage());
         }
         Entrada.aguardarEnter();
     }

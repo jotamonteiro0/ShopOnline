@@ -13,8 +13,14 @@ public class Carrinho {
     }
 
     public void adicionarItem(Produto produto, int quantidade) {
+        if (produto == null) {
+            throw new IllegalArgumentException("O produto nao pode ser nulo.");
+        }
+        if (quantidade <= 0) {
+            throw new IllegalArgumentException("A quantidade adicionada deve ser maior que zero.");
+        }
         for (ItemCarrinho item : itens) {
-            if (item.getProduto().getId().equals(produto.getId())) {
+            if (item.getProduto().getId().equalsIgnoreCase(produto.getId())) {
                 item.setQuantidade(item.getQuantidade() + quantidade);
                 return;
             }
@@ -23,7 +29,8 @@ public class Carrinho {
     }
 
     public boolean removerItem(String produtoId) {
-        return itens.removeIf(item -> item.getProduto().getId().equals(produtoId));
+        if (produtoId == null) return false;
+        return itens.removeIf(item -> item.getProduto().getId().equalsIgnoreCase(produtoId.trim()));
     }
 
     public void limpar() {

@@ -10,7 +10,16 @@ public class Cupom {
     private boolean utilizado;
 
     public Cupom(String codigo, TipoCupom tipo, double valor, LocalDate dataValidade) {
-        this.codigo = codigo.toUpperCase();
+        if (codigo == null || codigo.trim().isEmpty()) {
+            throw new IllegalArgumentException("O codigo do cupom nao pode ser vazio.");
+        }
+        if (tipo == null) {
+            throw new IllegalArgumentException("O tipo do cupom e obrigatorio.");
+        }
+        if (!Double.isFinite(valor) || valor < 0.0) {
+            throw new IllegalArgumentException("O valor do cupom nao pode ser negativo.");
+        }
+        this.codigo = codigo.trim().toUpperCase();
         this.tipo = tipo;
         this.valor = valor;
         this.dataValidade = dataValidade;
@@ -50,7 +59,7 @@ public class Cupom {
             return 0.0;
         }
         if (tipo == TipoCupom.PERCENTUAL) {
-            return subtotal * (valor / 100.0);
+            return Math.min(subtotal, subtotal * (valor / 100.0));
         } else {
             return Math.min(valor, subtotal);
         }

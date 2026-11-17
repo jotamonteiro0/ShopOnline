@@ -50,10 +50,18 @@ public class Main {
         System.out.println("==================================================");
 
         Cliente clienteVip = clienteRepo.buscarPorId("C02");
-        Carrinho carrinho = new Carrinho();
+        Produto p01 = produtoRepo.buscarPorId("P01");
+        Produto p02 = produtoRepo.buscarPorId("P02");
+        if (clienteVip == null || p01 == null || p02 == null
+                || p01.getQuantidadeEstoque() < 1 || p02.getQuantidadeEstoque() < 1) {
+            System.out.println("[Aviso] Estoque insuficiente ou dados ausentes para demonstracao automatica.");
+            System.out.println("Reponha o estoque de P01/P02 no menu interativo e tente novamente.");
+            return;
+        }
 
-        carrinho.adicionarItem(produtoRepo.buscarPorId("P01"), 1);
-        carrinho.adicionarItem(produtoRepo.buscarPorId("P02"), 1);
+        Carrinho carrinho = new Carrinho();
+        carrinho.adicionarItem(p01, 1);
+        carrinho.adicionarItem(p02, 1);
 
         Cupom cupom = new Cupom("BEMVINDO10", TipoCupom.PERCENTUAL, 10.0, LocalDate.now().plusDays(30));
         carrinho.aplicarCupom(cupom);
