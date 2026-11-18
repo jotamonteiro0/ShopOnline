@@ -2,9 +2,12 @@ package teste;
 
 import model.Carrinho;
 import model.Cliente;
+import model.ClienteVip;
+import model.Cupom;
 import model.Pedido;
 import model.Produto;
 import model.StatusPedido;
+import model.TipoCupom;
 import model.pagamento.PagamentoBoleto;
 import model.pagamento.PagamentoCartao;
 import model.pagamento.PagamentoPix;
@@ -18,6 +21,7 @@ import service.VendaService;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDate;
 import java.util.Comparator;
 
 /** Regressao do cancelamento pelo VendaService, com dados isolados em pasta temporaria. */
@@ -94,6 +98,20 @@ public class VerificacaoIntegracaoGabriel {
                     "restitui estoque apos reinicio");
             validar(!vendasReabertas.cancelarPedido("PED-03"), "evita estorno duplicado apos reinicio");
             validar(!vendasReabertas.cancelarPedido("INEXISTENTE"), "pedido inexistente nao cancela");
+
+            ClienteVip clienteVip = new ClienteVip("C02", "Cliente VIP", "vip@teste.com", 0, 0);
+            clientesReabertos.salvar(clienteVip);
+            Produto produtoVip = new Produto("P02", "Produto VIP", "", 100, 5, true);
+            produtosReabertos.salvar(produtoVip);
+            Carrinho carrinhoComDescontoAlto = carrinho(produtoVip, 1);
+            carrinhoComDescontoAlto.aplicarCupom(
+                    new Cupom("FIXO95", TipoCupom.VALOR_FIXO, 95.0, LocalDate.now().plusDays(5)));
+            Pedido pedidoZerado = vendasReabertas.finalizarPedido(
+                    "PED-04", clienteVip, carrinhoComDescontoAlto, new PagamentoPix());
+            validar(Math.abs(pedidoZerado.getValorFinal()) < 0.00001,
+                    "descontos acumulados nao geram valor final negativo");
+            validar(Math.abs(pedidoZerado.getDescontoTotal() - 100.0) < 0.00001,
+                    "desconto total limitado ao subtotal");
             System.out.println("INTEGRACAO GABRIEL: " + verificacoes + " verificacoes aprovadas.");
         } finally {
             try (var caminhos = Files.walk(pasta)) {
