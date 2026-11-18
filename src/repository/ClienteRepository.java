@@ -3,6 +3,7 @@ package repository;
 import model.Cliente;
 import model.ClienteVip;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class ClienteRepository {
@@ -43,7 +44,7 @@ public class ClienteRepository {
             return;
         }
 
-        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(file, StandardCharsets.UTF_8))) {
             String linha = reader.readLine(); // Header
             while ((linha = reader.readLine()) != null) {
                 if (linha.trim().isEmpty()) continue;
@@ -77,7 +78,7 @@ public class ClienteRepository {
             parent.mkdirs();
         }
 
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, StandardCharsets.UTF_8))) {
             writer.write("id;nome;email;pontos;saldoCashback;vip");
             writer.newLine();
             for (Cliente c : clientes.values()) {

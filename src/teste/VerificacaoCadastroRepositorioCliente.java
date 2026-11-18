@@ -13,10 +13,12 @@ public class VerificacaoCadastroRepositorioCliente {
         Path arquivo = pasta.resolve("clientes.csv");
         try {
             ClienteRepository repositorio = new ClienteRepository(arquivo.toString());
-            Cliente comum = new Cliente("C01", "Maria", "maria@email.com");
-            ClienteVip vip = new ClienteVip("C02", "Ana", "ana@email.com");
+            Cliente comum = new Cliente("C01", "João Monteiro", "joao@email.com");
+            ClienteVip vip = new ClienteVip("C02", "Vitória Salgado", "vitoria@email.com");
+            Cliente lucas = new Cliente("C03", "Lucas Silva", "lucas@email.com", 100, 0.0);
             repositorio.cadastrar(comum);
             repositorio.cadastrar(vip);
+            repositorio.cadastrar(lucas);
 
             String antes = Files.readString(arquivo);
             rejeitar(() -> repositorio.cadastrar(new ClienteVip("C01", "Outra", "outra@email.com")));
@@ -27,9 +29,24 @@ public class VerificacaoCadastroRepositorioCliente {
             verificar(Files.readString(arquivo).equals(antes), "Cadastro rejeitado deve preservar o CSV.");
 
             ClienteRepository recarregado = new ClienteRepository(arquivo.toString());
-            verificar(recarregado.listarTodos().size() == 2, "Dois clientes devem ser persistidos.");
+            verificar(recarregado.listarTodos().size() == 3, "Tres clientes devem ser persistidos.");
             verificar(!recarregado.buscarPorId("C01").isVip(), "Cliente comum deve continuar comum.");
             verificar(recarregado.buscarPorId("C02") instanceof ClienteVip, "VIP deve ser reconstruido como ClienteVip.");
+            verificar(recarregado.buscarPorId("C01").getNome().equals("João Monteiro"),
+                    "Nome do cliente comum deve preservar acentos.");
+            verificar(recarregado.buscarPorId("C02").getNome().equals("Vitória Salgado"),
+                    "Nome do cliente VIP deve preservar acentos.");
+            verificar(recarregado.buscarPorId("C01").getEmail().equals("joao@email.com"),
+                    "E-mail do cliente comum deve ser preservado.");
+            verificar(recarregado.buscarPorId("C02").getEmail().equals("vitoria@email.com"),
+                    "E-mail do cliente VIP deve ser preservado.");
+            Cliente lucasRecarregado = recarregado.buscarPorId("C03");
+            verificar(lucasRecarregado.getNome().equals("Lucas Silva")
+                    && lucasRecarregado.getEmail().equals("lucas@email.com")
+                    && !lucasRecarregado.isVip()
+                    && lucasRecarregado.getPontosFidelidade() == 100
+                    && lucasRecarregado.getSaldoCashback() == 0.0,
+                    "Dados de Lucas devem ser preservados.");
 
             comum.adicionarPontos(600);
             comum.creditarCashback(25.0);
