@@ -22,6 +22,16 @@ public class ClienteRepository {
         return clientes.get(id);
     }
 
+    public void cadastrar(Cliente cliente) {
+        if (cliente == null) {
+            throw new IllegalArgumentException("Cliente não pode ser nulo.");
+        }
+        if (clientes.containsKey(cliente.getId())) {
+            throw new IllegalArgumentException("Já existe um cliente com esse ID.");
+        }
+        salvar(cliente);
+    }
+
     public void salvar(Cliente cliente) {
         clientes.put(cliente.getId(), cliente);
         salvarNoArquivo();
