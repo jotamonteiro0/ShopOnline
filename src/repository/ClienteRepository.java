@@ -4,6 +4,7 @@ import model.Cliente;
 import model.ClienteVip;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.*;
 import java.util.*;
 
 public class ClienteRepository {
@@ -34,8 +35,17 @@ public class ClienteRepository {
     }
 
     public void salvar(Cliente cliente) {
-        clientes.put(cliente.getId(), cliente);
-        salvarNoArquivo();
+        Cliente anterior = clientes.put(cliente.getId(), cliente);
+        try {
+            salvarNoArquivo();
+        } catch (UncheckedIOException e) {
+            if (anterior == null) {
+                clientes.remove(cliente.getId());
+            } else {
+                clientes.put(cliente.getId(), anterior);
+            }
+            throw e;
+        }
     }
 
     public void carregarDoArquivo() {
@@ -72,23 +82,37 @@ public class ClienteRepository {
     }
 
     public void salvarNoArquivo() {
-        File file = new File(caminhoArquivo);
-        File parent = file.getParentFile();
-        if (parent != null && !parent.exists()) {
-            parent.mkdirs();
-        }
-
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, StandardCharsets.UTF_8))) {
-            writer.write("id;nome;email;pontos;saldoCashback;vip");
-            writer.newLine();
-            for (Cliente c : clientes.values()) {
-                writer.write(String.format(Locale.US, "%s;%s;%s;%d;%.2f;%b",
-                        c.getId(), c.getNome(), c.getEmail(),
-                        c.getPontosFidelidade(), c.getSaldoCashback(), c.isVip()));
+        Path destino = Path.of(caminhoArquivo).toAbsolutePath();
+        Path temporario = null;
+        try {
+            Files.createDirectories(destino.getParent());
+            temporario = Files.createTempFile(destino.getParent(), "clientes-", ".csv.tmp");
+            try (BufferedWriter writer = Files.newBufferedWriter(temporario, StandardCharsets.UTF_8)) {
+                writer.write("id;nome;email;pontos;saldoCashback;vip");
                 writer.newLine();
+                for (Cliente c : clientes.values()) {
+                    writer.write(String.format(Locale.US, "%s;%s;%s;%d;%.2f;%b",
+                            c.getId(), c.getNome(), c.getEmail(),
+                            c.getPontosFidelidade(), c.getSaldoCashback(), c.isVip()));
+                    writer.newLine();
+                }
+            }
+            try {
+                Files.move(temporario, destino,
+                        StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+            } catch (AtomicMoveNotSupportedException e) {
+                Files.move(temporario, destino, StandardCopyOption.REPLACE_EXISTING);
             }
         } catch (IOException e) {
-            System.err.println("Erro ao salvar clientes: " + e.getMessage());
+            throw new UncheckedIOException("Não foi possível salvar os clientes.", e);
+        } finally {
+            if (temporario != null) {
+                try {
+                    Files.deleteIfExists(temporario);
+                } catch (IOException e) {
+                    System.err.println("Não foi possível remover o arquivo temporário: " + e.getMessage());
+                }
+            }
         }
     }
 }

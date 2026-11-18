@@ -4,6 +4,7 @@ import model.Cliente;
 import model.ClienteVip;
 import repository.ClienteRepository;
 
+import java.io.UncheckedIOException;
 import java.util.List;
 
 public class MenuClientes {
@@ -55,6 +56,9 @@ public class MenuClientes {
             System.out.println("Cliente adicionado à lista.");
         } catch (IllegalArgumentException e) {
             System.out.println("[Erro] " + e.getMessage());
+        } catch (UncheckedIOException e) {
+            System.out.println("[Erro] Não foi possível salvar o cliente. "
+                    + "Verifique o arquivo e tente novamente.");
         }
         Entrada.aguardarEnter();
     }
