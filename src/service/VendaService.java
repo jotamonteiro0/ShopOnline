@@ -61,10 +61,9 @@ public class VendaService {
         double subtotal = carrinho.getSubtotal();
         double descontoVip = carrinho.calcularDescontoVip(cliente);
         double descontoCupom = carrinho.calcularDescontoCupom();
-        double totalIntermediario = subtotal - descontoVip - descontoCupom;
-        double valorFinal = formaPagamento.calcularValorFinal(totalIntermediario);
-        double descontoPagamento = totalIntermediario - valorFinal;
-        double descontoTotal = descontoVip + descontoCupom + Math.max(0, descontoPagamento);
+        double totalIntermediario = Math.max(0.0, subtotal - descontoVip - descontoCupom);
+        double valorFinal = Math.max(0.0, formaPagamento.calcularValorFinal(totalIntermediario));
+        double descontoTotal = Math.max(0.0, subtotal - valorFinal);
         double cashbackGerado = fidelidadeService.calcularCashback(cliente, valorFinal);
 
         Pedido pedido = new Pedido(pedidoId, cliente, carrinho.getItens(), subtotal,
