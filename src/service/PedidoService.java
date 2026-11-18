@@ -35,7 +35,12 @@ public class PedidoService {
         pedidoRepository.salvar(pedido);
     }
 
-    public Pedido buscarPedido(String id) { return pedidoRepository.buscarPorId(id); }
+    public Pedido buscarPedido(String id) {
+        return pedidoRepository.buscarPorId(id); }
+
+    public List<Pedido> listarPedidos(){
+        return pedidoRepository.listarTodos();
+    }
 
     /** Avanca exclusivamente EM_PROCESSAMENTO -> ENVIADO -> ENTREGUE. */
     public boolean avancarStatus(String id) {
