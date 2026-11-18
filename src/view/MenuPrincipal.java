@@ -50,7 +50,7 @@ public class MenuPrincipal {
             int opcao = Entrada.lerInteiro("Selecione uma opcao: ", 0, 6);
             switch (opcao) {
                 case 1 -> menuProdutos.exibirMenu();
-                case 2 -> menuClientesInfo();
+                case 2 -> new MenuClientes(clienteRepo).exibirMenu();
                 case 3 -> menuCarrinhoInfo();
                 case 4 -> menuPedidosInfo();
                 case 5 -> menuFidelidadeInfo();
@@ -61,20 +61,6 @@ public class MenuPrincipal {
                 }
             }
         }
-    }
-
-    private void menuClientesInfo() {
-        System.out.println("\n==================================================");
-        System.out.println("         MODULO: CLIENTES E ESPECIALIZACAO VIP    ");
-        System.out.println("             Responsavel: Maria Vitoria (dev_vitoria) ");
-        System.out.println("==================================================");
-        System.out.println("Clientes atualmente carregados do arquivo data/clientes.csv:");
-        for (Cliente c : clienteRepo.listarTodos()) {
-            System.out.println("  * " + c);
-        }
-        System.out.println("\n[Informacao] Os submenus interativos de cadastro e validacao");
-        System.out.println("estao em desenvolvimento na branch dev_vitoria.");
-        Entrada.aguardarEnter();
     }
 
     private void menuCarrinhoInfo() {
