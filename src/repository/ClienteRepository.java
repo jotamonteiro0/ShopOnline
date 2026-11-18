@@ -8,8 +8,10 @@ import java.nio.file.*;
 import java.util.*;
 
 public class ClienteRepository {
+    private static final String CABECALHO = "id;nome;email;pontos;saldoCashback;vip";
     private final String caminhoArquivo;
     private final Map<String, Cliente> clientes = new LinkedHashMap<>();
+    private boolean arquivoComErros;
 
     public ClienteRepository(String caminhoArquivo) {
         this.caminhoArquivo = caminhoArquivo;
@@ -54,41 +56,68 @@ public class ClienteRepository {
             return;
         }
 
+        Map<String, Cliente> carregados = new LinkedHashMap<>();
+        boolean encontrouErros = false;
         try (BufferedReader reader = new BufferedReader(new FileReader(file, StandardCharsets.UTF_8))) {
-            String linha = reader.readLine(); // Header
+            String linha = reader.readLine();
+            if (!CABECALHO.equals(linha)) {
+                throw new IOException("Cabeçalho de clientes inválido.");
+            }
+            int numeroLinha = 1;
             while ((linha = reader.readLine()) != null) {
-                if (linha.trim().isEmpty()) continue;
-                String[] partes = linha.split(";");
-                if (partes.length >= 6) {
+                numeroLinha++;
+                if (linha.isBlank()) continue;
+                try {
+                    String[] partes = linha.split(";", -1);
+                    if (partes.length != 6) {
+                        throw new IllegalArgumentException("Esperadas exatamente seis colunas.");
+                    }
                     String id = partes[0].trim();
                     String nome = partes[1].trim();
                     String email = partes[2].trim();
                     int pontos = Integer.parseInt(partes[3].trim());
                     double saldo = Double.parseDouble(partes[4].trim());
-                    boolean vip = Boolean.parseBoolean(partes[5].trim());
-
-                    Cliente c;
-                    if (vip) {
-                        c = new ClienteVip(id, nome, email, pontos, saldo);
-                    } else {
-                        c = new Cliente(id, nome, email, pontos, saldo);
+                    if (pontos < 0 || !Double.isFinite(saldo) || saldo < 0) {
+                        throw new IllegalArgumentException("Pontos e cashback devem ser não negativos e finitos.");
                     }
-                    clientes.put(id, c);
+                    if (!partes[5].trim().equalsIgnoreCase("true")
+                            && !partes[5].trim().equalsIgnoreCase("false")) {
+                        throw new IllegalArgumentException("VIP deve ser true ou false.");
+                    }
+                    boolean vip = Boolean.parseBoolean(partes[5].trim());
+                    Cliente c = vip ? new ClienteVip(id, nome, email, pontos, saldo)
+                            : new Cliente(id, nome, email, pontos, saldo);
+                    if (carregados.containsKey(c.getId())) {
+                        throw new IllegalArgumentException("ID de cliente repetido.");
+                    }
+                    carregados.put(c.getId(), c);
+                } catch (IllegalArgumentException e) {
+                    encontrouErros = true;
+                    System.err.printf("[AVISO CSV] Linha %d inválida em '%s': %s%n",
+                            numeroLinha, caminhoArquivo, e.getMessage());
                 }
             }
-        } catch (IOException | NumberFormatException e) {
+            clientes.clear();
+            clientes.putAll(carregados);
+            arquivoComErros = encontrouErros;
+        } catch (IOException e) {
+            arquivoComErros = true;
             System.err.println("Erro ao carregar clientes: " + e.getMessage());
         }
     }
 
     public void salvarNoArquivo() {
+        if (arquivoComErros) {
+            throw new UncheckedIOException("Corrija e recarregue o CSV de clientes antes de salvar.",
+                    new IOException("O arquivo de clientes contém erros de leitura."));
+        }
         Path destino = Path.of(caminhoArquivo).toAbsolutePath();
         Path temporario = null;
         try {
             Files.createDirectories(destino.getParent());
             temporario = Files.createTempFile(destino.getParent(), "clientes-", ".csv.tmp");
             try (BufferedWriter writer = Files.newBufferedWriter(temporario, StandardCharsets.UTF_8)) {
-                writer.write("id;nome;email;pontos;saldoCashback;vip");
+                writer.write(CABECALHO);
                 writer.newLine();
                 for (Cliente c : clientes.values()) {
                     writer.write(String.format(Locale.US, "%s;%s;%s;%d;%.2f;%b",
