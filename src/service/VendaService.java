@@ -3,6 +3,7 @@ package service;
 import model.*;
 import model.pagamento.FormaPagamento;
 import repository.ClienteRepository;
+import repository.PedidoRepository;
 import repository.ProdutoRepository;
 
 import java.util.*;
@@ -12,27 +13,47 @@ public class VendaService {
     private final ClienteRepository clienteRepository;
     private final EstoqueService estoqueService;
     private final FidelidadeService fidelidadeService;
+    private final PedidoService pedidoService;
     private final List<Pedido> pedidosRealizados = new ArrayList<>();
 
+    /** Mantem a assinatura usada pelo Main e demais modulos da equipe. */
     public VendaService(ProdutoRepository produtoRepository,
                         ClienteRepository clienteRepository,
                         EstoqueService estoqueService,
                         FidelidadeService fidelidadeService) {
-        this.produtoRepository = produtoRepository;
-        this.clienteRepository = clienteRepository;
-        this.estoqueService = estoqueService;
-        this.fidelidadeService = fidelidadeService;
+        this(produtoRepository, clienteRepository, estoqueService, fidelidadeService,
+                new PedidoService(new PedidoRepository("data/pedidos.csv", clienteRepository, produtoRepository),
+                        estoqueService));
+    }
+
+    /** Permite compartilhar a mesma instancia com os testes e com o menu interativo. */
+    public VendaService(ProdutoRepository produtoRepository,
+                        ClienteRepository clienteRepository,
+                        EstoqueService estoqueService,
+                        FidelidadeService fidelidadeService,
+                        PedidoService pedidoService) {
+        this.produtoRepository = Objects.requireNonNull(produtoRepository, "Repositorio de produtos obrigatorio.");
+        this.clienteRepository = Objects.requireNonNull(clienteRepository, "Repositorio de clientes obrigatorio.");
+        this.estoqueService = Objects.requireNonNull(estoqueService, "Servico de estoque obrigatorio.");
+        this.fidelidadeService = Objects.requireNonNull(fidelidadeService, "Servico de fidelidade obrigatorio.");
+        this.pedidoService = Objects.requireNonNull(pedidoService, "Servico de pedidos obrigatorio.");
     }
 
     public Pedido finalizarPedido(String pedidoId, Cliente cliente, Carrinho carrinho, FormaPagamento formaPagamento) {
+        Objects.requireNonNull(cliente, "Cliente obrigatorio.");
+        Objects.requireNonNull(carrinho, "Carrinho obrigatorio.");
+        Objects.requireNonNull(formaPagamento, "Pagamento obrigatorio.");
         if (carrinho.getItens().isEmpty()) {
-            throw new IllegalStateException("O carrinho está vazio.");
+            throw new IllegalStateException("O carrinho esta vazio.");
         }
-
-        // Validação de estoque
+        // Validar antes de alterar estoque, cashback, cupom ou carrinho.
+        if (pedidoService.buscarPedido(pedidoId) != null) {
+            throw new IllegalArgumentException("Ja existe um pedido com ID " + pedidoId);
+        }
         for (ItemCarrinho item : carrinho.getItens()) {
-            Produto p = produtoRepository.buscarPorId(item.getProduto().getId());
-            if (p == null || p.getQuantidadeEstoque() < item.getQuantidade()) {
+            Produto produto = produtoRepository.buscarPorId(item.getProduto().getId());
+            if (produto == null || item.getQuantidade() <= 0
+                    || produto.getQuantidadeEstoque() < item.getQuantidade()) {
                 throw new IllegalStateException("Estoque insuficiente para o produto: " + item.getProduto().getNome());
             }
         }
@@ -41,42 +62,73 @@ public class VendaService {
         double descontoVip = carrinho.calcularDescontoVip(cliente);
         double descontoCupom = carrinho.calcularDescontoCupom();
         double totalIntermediario = subtotal - descontoVip - descontoCupom;
-
         double valorFinal = formaPagamento.calcularValorFinal(totalIntermediario);
         double descontoPagamento = totalIntermediario - valorFinal;
         double descontoTotal = descontoVip + descontoCupom + Math.max(0, descontoPagamento);
+        double cashbackGerado = fidelidadeService.calcularCashback(cliente, valorFinal);
 
-        // Dar baixa no estoque
-        for (ItemCarrinho item : carrinho.getItens()) {
-            estoqueService.darBaixaEstoque(item.getProduto().getId(), item.getQuantidade());
+        Pedido pedido = new Pedido(pedidoId, cliente, carrinho.getItens(), subtotal,
+                descontoTotal, valorFinal, formaPagamento, cashbackGerado);
+
+        // Se a baixa ou o registro falhar, tenta recompor as unidades ja baixadas.
+        List<ItemCarrinho> baixados = new ArrayList<>();
+        try {
+            for (ItemCarrinho item : carrinho.getItens()) {
+                if (!estoqueService.darBaixaEstoque(item.getProduto().getId(), item.getQuantidade())) {
+                    throw new IllegalStateException("Falha na baixa do estoque: " + item.getProduto().getId());
+                }
+                baixados.add(item);
+            }
+            pedidoService.registrarPedido(pedido);
+        } catch (RuntimeException falha) {
+            for (int i = baixados.size() - 1; i >= 0; i--) {
+                ItemCarrinho item = baixados.get(i);
+                if (!estoqueService.reporEstoque(item.getProduto().getId(), item.getQuantidade())) {
+                    falha.addSuppressed(new IllegalStateException(
+                            "Falha na recomposicao do estoque: " + item.getProduto().getId()));
+                }
+            }
+            throw falha;
         }
 
-        // Calcular e processar fidelidade / cashback
-        double cashbackGerado = fidelidadeService.calcularCashback(cliente, valorFinal);
         fidelidadeService.processarFidelidadeECashback(cliente, valorFinal);
-
-        // Marcar cupom como utilizado
         if (carrinho.getCupomAplicado() != null) {
             carrinho.getCupomAplicado().marcarComoUtilizado();
         }
-
-        Pedido pedido = new Pedido(
-                pedidoId, cliente, carrinho.getItens(), subtotal,
-                descontoTotal, valorFinal, formaPagamento, cashbackGerado
-        );
-
         pedidosRealizados.add(pedido);
         carrinho.limpar();
         return pedido;
     }
 
+    /** O estorno deve ocorrer sempre pelo PedidoService, nunca diretamente pelo modelo. */
     public boolean cancelarPedido(String pedidoId) {
-        for (Pedido p : pedidosRealizados) {
-            if (p.getId().equals(pedidoId)) {
-                return p.cancelar();
+        boolean cancelado = pedidoService.cancelarPedido(pedidoId);
+        if (cancelado) {
+            // Sincroniza tambem o objeto mantido no relatorio de vendas da sessao.
+            for (Pedido pedido : pedidosRealizados) {
+                if (pedido.getId().equals(pedidoId)) pedido.cancelar();
             }
         }
-        return false;
+        return cancelado;
+    }
+
+    public boolean avancarStatusPedido(String pedidoId) {
+        if (!pedidoService.avancarStatus(pedidoId)) return false;
+        Pedido atualizado = pedidoService.buscarPedido(pedidoId);
+        for (Pedido pedido : pedidosRealizados) {
+            if (pedido.getId().equals(pedidoId)) {
+                while (pedido.getStatus() != atualizado.getStatus() && pedido.avancarStatus()) {
+                    // Atualiza o status do relatorio em memoria sem duplicar a persistencia.
+                }
+            }
+        }
+        return true;
+    }
+
+    public Pedido buscarPedido(String pedidoId) { return pedidoService.buscarPedido(pedidoId); }
+
+    public List<Pedido> listarPedidos() {
+        return pedidoService.listarPedidos();
     }
 
     public List<Pedido> getPedidosRealizados() {
