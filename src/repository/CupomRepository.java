@@ -96,8 +96,9 @@ public class CupomRepository implements Repositorio<Cupom, String> {
                         if (partes.length >= 5 && !partes[4].trim().isEmpty()) {
                             String[] ids = partes[4].trim().split(",");
                             for (String id : ids) {
-                                if (!id.trim().isEmpty()) {
-                                    clientesUtilizados.add(id.trim().toUpperCase());
+                                String trimmedId = id.trim();
+                                if (!trimmedId.isEmpty() && !trimmedId.equalsIgnoreCase("true") && !trimmedId.equalsIgnoreCase("false")) {
+                                    clientesUtilizados.add(trimmedId.toUpperCase());
                                 }
                             }
                         }

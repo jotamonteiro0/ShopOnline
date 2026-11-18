@@ -23,7 +23,9 @@ public class VerificacaoModuloLucas {
         testarCupomPercentualEFixo();
         testarValidadeEExpiracaoCupom();
         testarUsoUnicoPorClienteEOutrosClientes();
+        testarReutilizacaoIndevidaECarrinhoRemocaoCupom();
         testarPersistenciaCupomCSV();
+        testarFiltroBooleanoCSV();
         testarCombinacaoVipCupomETotalNaoNegativo();
 
         System.out.println("==================================================");
@@ -133,6 +135,61 @@ public class VerificacaoModuloLucas {
         assertTest("Tipo do cupom carregado corretamente", cCarregado.getTipo() == TipoCupom.PERCENTUAL);
         assertTest("Valor do cupom carregado corretamente", cCarregado.getValor() == 15.0);
         assertTest("Historico de clientes utilizados persistido no CSV", cCarregado.foiUtilizadoPor("C01"));
+
+        if (f.exists()) f.delete();
+    }
+
+    private static void testarReutilizacaoIndevidaECarrinhoRemocaoCupom() {
+        Carrinho carrinho = new Carrinho();
+        Produto p = new Produto("P1", "Produto", "Desc", 100.0, 10, false);
+        carrinho.adicionarItem(p, 1);
+
+        Cupom cupom = new Cupom("PROMO10", TipoCupom.PERCENTUAL, 10.0, LocalDate.now().plusDays(5));
+        Cliente cliente = new Cliente("C01", "Cliente 1", "c1@email.com");
+
+        boolean primeiraAplicacao = carrinho.aplicarCupom(cupom, cliente);
+        assertTest("Primeira aplicacao de cupom com cliente aceita", primeiraAplicacao);
+
+        // Marcar como utilizado para simular o uso
+        cupom.marcarComoUtilizado(cliente.getId());
+
+        boolean segundaAplicacao = carrinho.aplicarCupom(cupom, cliente);
+        assertTest("Tentativa de reutilizacao do mesmo cupom pelo mesmo cliente e rejeitada (retorna false)", !segundaAplicacao);
+
+        // Testar remocao de cupom do carrinho
+        carrinho.aplicarCupom(cupom); // forcando apply para teste de remocao
+        assertTest("Cupom esta aplicado no carrinho", carrinho.getCupomAplicado() != null);
+
+        boolean removido = carrinho.removerCupom();
+        assertTest("Remocao de cupom do carrinho efetivada com sucesso", removido && carrinho.getCupomAplicado() == null);
+
+        boolean removerNovamente = carrinho.removerCupom();
+        assertTest("Remover cupom quando nenhum esta aplicado retorna falso", !removerNovamente);
+    }
+
+    private static void testarFiltroBooleanoCSV() {
+        String arquivoTeste = "data/test_bool.csv";
+        File f = new File(arquivoTeste);
+        if (f.exists()) f.delete();
+
+        // Escrever manualmente CSV com artefatos TRUE / FALSE na coluna clientesUtilizados
+        try (java.io.PrintWriter pw = new java.io.PrintWriter(new File(arquivoTeste), "UTF-8")) {
+            pw.println("codigo;tipo;valor;dataValidade;clientesUtilizados");
+            pw.println("CUPOM1;PERCENTUAL;10.00;2030-01-01;FALSE");
+            pw.println("CUPOM2;VALOR_FIXO;20.00;2030-01-01;C03,FALSE");
+            pw.println("CUPOM3;PERCENTUAL;10.00;2030-01-01;TRUE");
+        } catch (Exception e) {
+            // ignore
+        }
+
+        CupomRepository repo = new CupomRepository(arquivoTeste);
+        Cupom c1 = repo.buscarPorCodigo("CUPOM1");
+        Cupom c2 = repo.buscarPorCodigo("CUPOM2");
+        Cupom c3 = repo.buscarPorCodigo("CUPOM3");
+
+        assertTest("Cupom com FALSE no CSV nao adiciona FALSE como cliente", c1 != null && c1.getClientesUtilizados().isEmpty());
+        assertTest("Cupom com C03,FALSE adiciona apenas C03 e filtra FALSE", c2 != null && c2.getClientesUtilizados().size() == 1 && c2.foiUtilizadoPor("C03"));
+        assertTest("Cupom com TRUE no CSV nao adiciona TRUE como cliente", c3 != null && c3.getClientesUtilizados().isEmpty());
 
         if (f.exists()) f.delete();
     }

@@ -90,7 +90,15 @@ public class Carrinho {
             this.cupomAplicado = cupom;
             return true;
         }
-        return aplicarCupom(cupom);
+        return false;
+    }
+
+    public boolean removerCupom() {
+        if (cupomAplicado != null) {
+            cupomAplicado = null;
+            return true;
+        }
+        return false;
     }
 
     public Cupom getCupomAplicado() {

@@ -246,10 +246,18 @@ public class MenuCarrinho {
             case 2 -> cadastrarCupom();
             case 3 -> aplicarCupom();
             case 4 -> {
-                carrinho.aplicarCupom(null, null);
-                System.out.println("[Sucesso] Cupom removido do carrinho!");
-                System.out.printf("[Atualizacao] Subtotal: R$ %.2f | Total Final recalculado: R$ %.2f%n",
-                        carrinho.getSubtotal(), carrinho.calcularTotal(clienteAtual));
+                if (carrinho.getCupomAplicado() == null) {
+                    System.out.println("[Aviso] Nao ha nenhum cupom aplicado no carrinho.");
+                } else {
+                    boolean removido = carrinho.removerCupom();
+                    if (removido) {
+                        System.out.println("[Sucesso] Cupom removido do carrinho!");
+                        System.out.printf("[Atualizacao] Subtotal: R$ %.2f | Total Final recalculado: R$ %.2f%n",
+                                carrinho.getSubtotal(), carrinho.calcularTotal(clienteAtual));
+                    } else {
+                        System.out.println("[Erro] Nao foi possivel remover o cupom.");
+                    }
+                }
                 Entrada.aguardarEnter();
             }
         }
