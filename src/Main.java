@@ -8,6 +8,7 @@ import service.VendaService;
 import view.MenuPrincipal;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
 public class Main {
     public static void main(String[] args) {
@@ -59,7 +60,7 @@ public class Main {
         carrinho.aplicarCupom(cupom);
 
         FormaPagamento pagamentoPix = new PagamentoPix();
-        Pedido pedido = vendaService.finalizarPedido("PED-1001", clienteVip, carrinho, pagamentoPix);
+        Pedido pedido = vendaService.finalizarPedido("PED-" + UUID.randomUUID().toString().toUpperCase(), clienteVip, carrinho, pagamentoPix);
 
         System.out.println("\nPedido Finalizado:");
         System.out.println("  " + pedido);
