@@ -15,6 +15,12 @@ public class Cliente {
         this.id = validarTexto(id, "ID");
         setNome(nome);
         setEmail(email);
+        if (pontosFidelidade < 0) {
+            throw new IllegalArgumentException("Pontos de fidelidade não podem ser negativos.");
+        }
+        if (!Double.isFinite(saldoCashback) || saldoCashback < 0) {
+            throw new IllegalArgumentException("Saldo de cashback deve ser finito e não negativo.");
+        }
         this.pontosFidelidade = pontosFidelidade;
         this.saldoCashback = saldoCashback;
     }

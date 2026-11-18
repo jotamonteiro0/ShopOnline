@@ -5,6 +5,14 @@ import model.ClienteVip;
 
 public class VerificacaoCadastroCliente {
     public static void main(String[] args) {
+        rejeitar(() -> new Cliente("C01", "João Monteiro", "joao@email.com", -1, 0.0));
+        rejeitar(() -> new ClienteVip("C02", "Vitória Salgado", "vitoria@email.com", -1, 0.0));
+        for (double saldoInvalido : new double[]{-0.01, Double.NaN, Double.POSITIVE_INFINITY,
+                Double.NEGATIVE_INFINITY}) {
+            rejeitar(() -> new Cliente("C01", "João Monteiro", "joao@email.com", 0, saldoInvalido));
+            rejeitar(() -> new ClienteVip("C02", "Vitória Salgado", "vitoria@email.com", 0, saldoInvalido));
+        }
+
         for (String invalido : new String[]{null, "", "   ", "texto;extra", "texto\nextra", "texto\rextra"}) {
             rejeitar(() -> new Cliente(invalido, "João Monteiro", "joao@email.com"));
             rejeitar(() -> new Cliente("C01", invalido, "joao@email.com"));
