@@ -36,25 +36,29 @@ O sistema integra os seguintes processos críticos de negócio:
 
 ## 2. Modelagem Orientada a Objetos e Diagrama de Classes
 
-A arquitetura do projeto foi desenhada visando aderência aos padrões de responsabilidade única e desacoplamento.
+A modelagem separa os dados e comportamentos de clientes (`model`), a leitura e gravação em CSV (`repository`) e a interação pelo console (`view`). `MenuClientes` recebe um `ClienteRepository` pelo construtor e reutiliza `Entrada` para ler as opções. A conexão desse submenu ao `MenuPrincipal` pertence à etapa de integração.
 
 ```
-       +-----------------------+
-       |        Cliente        |
-       +-----------------------+
-       | - id: String          |
-       | - nome: String        |
-       | - email: String       |
-       | - pontos: int         |
-       | - saldoCashback: dbl  |
-       +-----------------------+
-                   ^
-                   | (Herança)
-       +-----------------------+
-       |      ClienteVip       |
-       +-----------------------+
-       | + calcularDescVip()   |
-       +-----------------------+
+       +-------------------------------------------------+
+       |                     Cliente                     |
+       +-------------------------------------------------+
+       | - id: String                                    |
+       | - nome: String                                  |
+       | - email: String                                 |
+       | - pontosFidelidade: int                         |
+       | - saldoCashback: double                         |
+       +-------------------------------------------------+
+       | + isVip(): boolean                              |
+       | + calcularDescontoVip(produto: Produto): double  |
+       +-------------------------------------------------+
+                              ^
+                              | (Herança)
+       +-------------------------------------------------+
+       |                   ClienteVip                    |
+       +-------------------------------------------------+
+       | + isVip(): boolean                              |
+       | + calcularDescontoVip(produto: Produto): double  |
+       +-------------------------------------------------+
 
        +------------------------------------+
        |       <<interface>>                |
@@ -65,10 +69,26 @@ A arquitetura do projeto foi desenhada visando aderência aos padrões de respon
        +------------------------------------+
               ^            ^           ^
               |            |           | (Polimorfismo)
-     +-------------+ +-------------+ +---------------+
-     |PagamentoPix | |PagamentoCard| |PagamentoBoleto|
-     +-------------+ +-------------+ +---------------+
+     +-------------+ +---------------+ +---------------+
+     |PagamentoPix | |PagamentoCartao| |PagamentoBoleto|
+     +-------------+ +---------------+ +---------------+
 ```
+
+O diagrama destaca os atributos de `Cliente` e os métodos sobrescritos por `ClienteVip`; construtores, getters, setters e operações de pontos e cashback foram omitidos para facilitar a leitura.
+
+### 2.1 Herança, encapsulamento e polimorfismo de clientes
+
+`ClienteVip extends Cliente` representa uma especialização: um cliente VIP possui os mesmos dados cadastrais, pontos e saldo de um cliente comum, mas tem uma regra adicional de desconto. Essa relação permite reutilizar as validações de ID, nome e e-mail sem duplicá-las na subclasse. Os atributos permanecem privados em `Cliente` e são acessados pelos métodos públicos herdados.
+
+Os construtores de `ClienteVip` chamam `super(...)` para inicializar a parte herdada do objeto. O construtor simples inicia pontos e cashback em zero; o construtor completo permite reconstruir os valores persistidos no CSV.
+
+Os métodos `isVip()` e `calcularDescontoVip(Produto)` usam `@Override`. Uma variável declarada como `Cliente` pode referenciar um `ClienteVip`; a implementação executada depende do objeto em tempo de execução. Em `Cliente`, o desconto é zero. Em `ClienteVip`, ele corresponde a 10% do preço unitário somente quando `produto.isPromocaoVip()` é verdadeiro. Por exemplo, um produto promocional de R$ 199,90 gera R$ 19,99 de desconto por unidade para um VIP. A aplicação desse valor às quantidades do carrinho pertence ao módulo de carrinho.
+
+`ClienteRepository` grava o indicador `vip` no CSV e usa esse campo para reconstruir `Cliente` ou `ClienteVip`. O cadastro rejeita IDs repetidos; atualizações de clientes existentes continuam usando `salvar()`. A leitura identifica registros inválidos sem interromper os registros seguintes e bloqueia regravações até que o arquivo seja corrigido e recarregado, evitando apagar as linhas rejeitadas. A escrita usa UTF-8 e arquivo temporário antes de substituir o destino.
+
+### 2.2 Verificações do módulo de clientes
+
+As classes de verificação cobrem validações cadastrais, duplicidade, persistência comum/VIP, acentos, desconto de 10%, navegação do submenu, registros CSV inválidos e falhas de gravação. Os testes de persistência usam arquivos temporários para preservar `data/clientes.csv`. A integração do submenu ao menu principal e a revisão conjunta na branch `developer` permanecem etapas da equipe.
 
 ---
 
@@ -92,7 +112,7 @@ public boolean reduzirEstoque(int quantidade) {
 ```
 
 ### 3.3 Herança
-A classe `ClienteVip` reutiliza 100% da lógica e persistência de `Cliente`, redefinindo apenas os métodos pertinentes ao tratamento especial de descontos:
+A classe `ClienteVip` herda os comportamentos de `Cliente` e sobrescreve os métodos que identificam a especialização e calculam o desconto. A persistência de ambos os tipos é feita por `ClienteRepository`:
 ```java
 public class ClienteVip extends Cliente {
     private static final double DESCONTO_PROMOCAO_VIP = 0.10; // 10%

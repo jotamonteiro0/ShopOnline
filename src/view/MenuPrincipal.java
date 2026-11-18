@@ -117,7 +117,7 @@ public class MenuPrincipal {
 
         Cliente clienteVip = clienteRepo.buscarPorId("C02");
         if (clienteVip == null) {
-            clienteVip = new ClienteVip("C02", "Vitoria Salgado", "vitoria@email.com", 1600, 120.0);
+            clienteVip = new ClienteVip("C02", "Vitória Salgado", "vitoria@email.com", 1600, 120.0);
             clienteRepo.salvar(clienteVip);
         }
 

@@ -8,6 +8,7 @@ import service.VendaService;
 import view.MenuPrincipal;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
 public class Main {
     public static void main(String[] args) {
@@ -28,8 +29,8 @@ public class Main {
         }
 
         if (clienteRepo.listarTodos().isEmpty()) {
-            clienteRepo.salvar(new Cliente("C01", "Joao Monteiro", "joao@email.com", 600, 25.0)); // Prata
-            clienteRepo.salvar(new ClienteVip("C02", "Vitoria Salgado", "vitoria@email.com", 1600, 120.0)); // VIP Ouro
+            clienteRepo.salvar(new Cliente("C01", "João Monteiro", "joao@email.com", 600, 25.0)); // Prata
+            clienteRepo.salvar(new ClienteVip("C02", "Vitória Salgado", "vitoria@email.com", 1600, 120.0)); // VIP Ouro
             clienteRepo.salvar(new Cliente("C03", "Lucas Silva", "lucas@email.com", 100, 0.0)); // Bronze
         }
 
@@ -59,7 +60,7 @@ public class Main {
         carrinho.aplicarCupom(cupom);
 
         FormaPagamento pagamentoPix = new PagamentoPix();
-        Pedido pedido = vendaService.finalizarPedido("PED-1001", clienteVip, carrinho, pagamentoPix);
+        Pedido pedido = vendaService.finalizarPedido("PED-" + UUID.randomUUID().toString().toUpperCase(), clienteVip, carrinho, pagamentoPix);
 
         System.out.println("\nPedido Finalizado:");
         System.out.println("  " + pedido);
