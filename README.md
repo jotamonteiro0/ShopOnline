@@ -1,165 +1,145 @@
-# Trabalho Pratico - Programacao Orientada a Objetos (P2)
+# ShopOnline - Trabalho de POO (P2)
 
-Implementacao do sistema de comercio eletronico ShopOnline, aplicando os principios fundamentais da Orientacao a Objetos (Abstracao, Encapsulamento, Heranca e Polimorfismo), persistencia em arquivos CSV, tratamento de excecoes e boas praticas de arquitetura.
+Sistema de loja virtual em Java, com interface de console, produtos, clientes comuns e VIP, carrinho, cupons, pagamentos simulados, pedidos, fidelidade, cashback e relatórios de vendas.
 
-iCEV - Instituto de Ensino Superior - Engenharia de Software, 2o Periodo  
-Avaliacao P2 - Prof. Samuel Oliveira (samuel.oliveira@grupocev.com)  
-Meta de Conclusao da Equipe: Sexta-feira, 20 de Novembro de 2026  
-Apresentacoes: 23 e 26 de Novembro de 2026
+iCEV - Engenharia de Software, 2º período. Disciplina: Programação Orientada a Objetos. Professor: Samuel Oliveira.
 
----
+## Executar
 
-## 1. Equipe e Divisao de Trabalho (5 Integrantes)
-
-| Integrante | Branch | GitHub | Modulos e Responsabilidades |
-| :--- | :--- | :--- | :--- |
-| **Joao Guilherme Monteiro** | `dev_joao` | `@jotamonteiro0` | Catalogo de Produtos, Estoque (baixa automatica e alerta < 5 un.), Persistencia CSV base e Arquitetura. |
-| **Maria Vitoria Salgado** | `dev_vitoria` | `@vitoriasalgado` | Clientes, especializacao VIP (Heranca de ClienteVip), validacoes cadastrais e persistencia de clientes. |
-| **Lucas Silveira** | `dev_lucas` | `@lucassilveira8973` | Carrinho de compras, agregacao de itens, cupons de desconto (% e fixo, validade e uso unico por cliente). |
-| **Gabriel Buhatem** | `dev_gabriel` | `@GabrieldeAssisBuhatem` | Meios de pagamento (Polimorfismo via FormaPagamento: PIX, Cartao, Boleto), ciclo de pedidos e cancelamento restrito. |
-| **Lavynne Marianne** | `dev_lavynne` | `@lavynnemarianne13-alt` | Programa de fidelidade, carteira de cashback (acumulo e metodo usarCashback), relatorios de vendas e menu console. |
-
----
-
-## 2. Como Executar
-
-O projeto foi construido utilizando exclusivamente a biblioteca padrao do Java, sem necessidade de Maven, Gradle ou bibliotecas externas.
-
-### Execucao Rapida (Scripts)
+É necessário um **JDK 17 ou superior**, com `java` e `javac` disponíveis no terminal. O programa usa somente a biblioteca padrão do Java. Execute os comandos na raiz do projeto.
 
 ```bash
-./run.sh          # Linux e macOS
-run.bat           # Windows
+./run.sh
 ```
 
-### Execucao Manual via Terminal
+No Windows, o script disponível é `run.bat`. A execução nesse sistema operacional não foi validada nesta revisão. Para compilar e executar manualmente em macOS/Linux:
 
 ```bash
-# Compilar todos os arquivos Java
 mkdir -p out
-find src -name "*.java" -print0 | xargs -0 javac -d out
-
-# Executar a aplicacao
+find src -name '*.java' -print0 | xargs -0 javac --release 17 -encoding UTF-8 -d out
 java -cp out Main
 ```
 
-**Requisitos:** JDK 17 ou superior instalado (testado e homologado no OpenJDK 21 e OpenJDK 26).
+Para executar a demonstração automática depois de compilar:
 
----
-
-## 3. Estrutura do Repositorio
-
-```
-ShopOnline/
-├── .idea/                              # Configuracoes do projeto no IntelliJ IDEA
-├── ShopOnline.iml                      # Modulo Java do IntelliJ IDEA
-├── data/                               # Fonte unica de dados persistidos em CSV
-│   ├── produtos.csv                    # Inventario e controle de estoque
-│   ├── clientes.csv                    # Clientes, pontos e saldos de cashback
-│   ├── cupons.csv                      # Cupons cadastrados e controle de uso
-│   └── pedidos.csv                     # Historico consolidado de pedidos
-├── docs/                               # Documentacao de apoio
-│   ├── Guia_Geral_Equipe_ShopOnline.pdf # Guia completo da equipe (prazos, divisoes e regras)
-│   ├── Divisao_Tarefas_P2.pdf          # PDF oficial de distribuicao de tarefas
-│   └── CHECKLIST_DEV_JOAO.md           # Guia de verificacao do modulo do Joao
-├── relatorio/                          # Documentacao academica para a entrega
-│   ├── relatorio-decisoes.md           # Registro formal das decisoes de arquitetura OO
-│   └── relatorio-tecnico.md            # Relatorio tecnico completo (4+ paginas)
-├── src/                                # Codigo-fonte da aplicacao Java
-│   ├── Main.java                       # Ponto de entrada, testes e fluxo demonstrativo
-│   ├── model/                          # Entidades do dominio
-│   │   ├── Cliente.java                # Modelo de cliente com carteira de cashback
-│   │   ├── ClienteVip.java             # Heranca de Cliente com 10% desconto em itens VIP
-│   │   ├── NivelFidelidade.java        # Enum (Bronze, Prata, Ouro) com percentuais
-│   │   ├── Produto.java                # Modelo com regra de alerta de reposicao (< 5)
-│   │   ├── ItemCarrinho.java           # Item associado ao carrinho com subtotal
-│   │   ├── Carrinho.java               # Agregacao de itens, cupons e totalizadores
-│   │   ├── Cupom.java                  # Cupom com validacao de expiracao e uso unico
-│   │   ├── TipoCupom.java              # Enum (PERCENTUAL ou VALOR_FIXO)
-│   │   ├── StatusPedido.java           # Enum de estados (EM_PROCESSAMENTO, ENVIADO, etc.)
-│   │   ├── Pedido.java                 # Registro definitivo e regra de cancelamento seguro
-│   │   └── pagamento/                  # Camada de pagamentos polimorficos
-│   │       ├── FormaPagamento.java     # Interface de contrato financeiro
-│   │       ├── PagamentoPix.java       # Implementacao com 5% de desconto
-│   │       ├── PagamentoCartao.java    # Implementacao em ate 10x sem juros
-│   │       └── PagamentoBoleto.java    # Implementacao via boleto bancario
-│   ├── repository/                     # Camada de persistencia em arquivos
-│   │   ├── ProdutoRepository.java      # Leitura e escrita no produtos.csv
-│   │   └── ClienteRepository.java      # Leitura e escrita no clientes.csv
-│   ├── service/                        # Camada de servicos e regras de negocio
-│   │   ├── EstoqueService.java         # Gestao de baixa e alerta preventivo de reposicao
-│   │   ├── FidelidadeService.java      # Calculo de pontos e acumulo de saldo
-│   │   └── VendaService.java           # Checkout, validacoes e emissao de relatorios
-│   └── teste/                          # Suites de verificacao de modulos
-│       └── VerificacaoModuloJoao.java   # Suite de testes e checklist do Joao
-├── run.sh                              # Script de compilacao e execucao para Linux/macOS
-├── run.bat                             # Script de compilacao e execucao para Windows
-└── README.md                           # Guia principal do projeto
+```bash
+java -cp out Main --demo
 ```
 
----
+O diretório de trabalho deve ser a raiz `ShopOnline`, inclusive na IDE, pois os caminhos dos dados são relativos. A execução interativa e a demonstração **alteram os CSVs de `data/`**. Guarde uma cópia antes de ensaiar com dados que precise preservar. A demonstração consome uma unidade de P01 e P02 e precisa desses produtos com estoque disponível; o cupom BEMVINDO10 só é aplicado se estiver válido para o cliente.
 
-## 4. Contrato dos Arquivos de Dados (data/)
+## Usar o sistema
 
-Os arquivos sao armazenados em formato CSV compartilhado, com as seguintes regras de padronizacao:
-* **Codificacao:** UTF-8 sem BOM.
-* **Separador de campos:** Ponto e virgula (`;`).
-* **Separador decimal:** Ponto (`.`) obrigatorio para valores monetarios (`4500.00`, nunca virgula).
-* **Cabecalho:** Fixo na linha 1 de cada arquivo.
+| Opção | Operações |
+| --- | --- |
+| 1 - Produtos e estoque | Cadastrar, listar, consultar, repor estoque e consultar alertas abaixo de 5 unidades. |
+| 2 - Clientes e VIP | Cadastrar clientes comuns e VIP e listar cadastros. |
+| 3 - Carrinho e cupons | Selecionar cliente, adicionar/remover itens, cadastrar/aplicar/remover cupom e finalizar compra. |
+| 4 - Pedidos | Listar pedidos, avançar status e cancelar pedidos em processamento. |
+| 5 - Fidelidade e relatórios | Consultar pontos, níveis, saldos, produtos vendidos e receitas. |
+| 6 - Demonstração | Executar uma compra de exemplo; no modo interativo, permite optar por usar cashback. |
+| 0 - Sair | Encerrar o programa. |
 
-| Arquivo | Colunas | Descricao |
-| :--- | :--- | :--- |
-| `produtos.csv` | `id;nome;descricao;preco;estoque;promocaoVip` | Catalogo de produtos, unidades e itens VIP. |
-| `clientes.csv` | `id;nome;email;pontos;saldoCashback;vip` | Clientes, pontuacao acumulada e saldo de cashback. |
-| `cupons.csv` | `codigo;tipo;valor;dataValidade;utilizado` | Cupons cadastrados e controle de uso unico. |
-| `pedidos.csv` | `id;clienteId;subtotal;desconto;totalFinal;formaPagamento;status;dataCriacao;cashbackGerado` | Historico consolidado de pedidos e faturamento. |
+No carrinho, confira o cliente ativo antes de comprar. Selecione PIX, cartão com 1 a 10 parcelas ou boleto no checkout. Havendo saldo, o programa pergunta se deseja usar cashback. O ID do pedido aparece na confirmação e pode ser consultado na opção 4.
 
----
+## Regras implementadas
 
-## 5. Principios de POO Justificados
+- A venda valida a disponibilidade e baixa o estoque. O alerta ocorre com **menos de 5 unidades**.
+- Cliente VIP recebe **10% de desconto nos produtos marcados como promoção VIP**. Ser VIP e possuir nível Ouro são características independentes.
+- Um pedido pode ter **um cupom**, percentual ou fixo, válido até a data informada inclusive. O mesmo código pode ser usado uma vez por cliente, com histórico persistido.
+- Os descontos VIP e de cupom incidem sobre o subtotal. O resultado é limitado a zero; em seguida aplica-se o pagamento: PIX reduz 5%, cartão e boleto mantêm o valor.
+- Se o cliente optar pelo resgate, o cashback existente abate o valor após os descontos e o pagamento, limitado ao total a pagar.
+- Pontos e novo cashback são calculados sobre o valor final após o resgate. Compras **acima de R$ 100** geram a parte inteira de `valorFinal / 10`; compras de R$ 100 não geram pontos.
+- O percentual de cashback considera o nível **antes dos pontos da compra atual**: Bronze até 499 pontos (2%), Prata de 500 a 1.499 (5%) e Ouro a partir de 1.500 (8%). A geração de cashback não depende do limite de R$ 100 exigido para pontos.
+- Os valores finais e o cashback são arredondados para duas casas, com `HALF_UP`. Cupons também são normalizados para duas casas e descontos que arredondariam para zero são rejeitados.
+- O fluxo de status é `EM_PROCESSAMENTO -> ENVIADO -> ENTREGUE`. Somente pedidos em processamento podem ser cancelados, com reposição dos itens no estoque persistido. O relatório exclui cancelados das receitas e quantidades vendidas.
 
-1. **Abstracao:** Isolamento das entidades do mundo real (`Produto`, `Cliente`, `Carrinho`, `Pedido`, `Cupom`) com atributos e metodos focados exclusivamente nas necessidades do e-commerce.
-2. **Encapsulamento:** Todos os atributos sao privados. Metodos de manipulacao contem validacoes de negocio (ex.: o estoque nunca fica negativo, o saldo de cashback nao pode ser alterado diretamente sem transacao).
-3. **Heranca:** `ClienteVip` herda de `Cliente`, estendendo seu comportamento para calcular automaticamente 10% de desconto em produtos marcados em promocao VIP.
-4. **Polimorfismo:** A interface `FormaPagamento` possui implementacoes concretas (`PagamentoPix`, `PagamentoCartao`, `PagamentoBoleto`). O `VendaService` efetua o calculo final chamando `formaPagamento.calcularValorFinal(total)` sem condicionais `if/else` ou dependencias de regras especificas de cada meio.
+As regras de ordem de cálculo e arredondamento são decisões da implementação para os pontos que o enunciado não detalha.
 
----
+## Organização do código
 
-## 6. Regras de Negocio e Casos Especiais
+```text
+src/
+  Main.java                 Inicialização e demonstração
+  model/                    Entidades, enumerações, carrinho e cupom
+    pagamento/              Interface FormaPagamento e implementações
+  repository/               Persistência de produtos, clientes, cupons e pedidos
+  service/                  Estoque, fidelidade, checkout e ciclo de pedidos
+  view/                     Entrada e menus do console
+  teste/                    12 classes de verificação sem frameworks externos
+data/                       CSVs usados pela aplicação
+relatorio/                  Relatório técnico editável, PDF e decisões de projeto
+docs/                       Planejamento original da equipe e checklist de produtos
+```
 
-* **Controle de Estoque e Alerta:** Baixa automatica a cada venda. Caso o saldo apos a venda fique com **menos de 5 unidades**, o sistema emite automaticamente o alerta `[ALERTA DE REPOSICAO]`.
-* **Cancelamento Seguro:** O cancelamento de um pedido so e autorizado se o seu status for `EM_PROCESSAMENTO`. Ao cancelar, todos os produtos sao estornados imediatamente ao estoque. Pedidos ja enviados ou entregues nao podem ser cancelados.
-* **Programa de Fidelidade e Cashback:**
-  * Compras acima de R$ 100,00 geram 1 ponto a cada R$ 10,00.
-  * Faixas: **Bronze** (ate 499 pts -> 2% cashback), **Prata** (500 a 1.499 pts -> 5% cashback), **Ouro** (1.500+ pts -> 8% cashback).
-  * O cashback acumulado fica disponivel na carteira do cliente para compras futuras.
-* **Cupons:** Suporte a descontos percentuais e em valor fixo, com verificacao de data de validade e controle de uso unico por cliente.
+## Persistência
 
----
+Os CSVs usam UTF-8, `;` como separador e ponto nos valores decimais. Os arquivos não são um banco de dados e não possuem controle de acesso concorrente.
 
-## 7. Git Flow da Equipe e Cronograma (Prazo Unico e Fatal: Sexta-feira, 20/11)
+| Arquivo | Cabeçalho |
+| --- | --- |
+| `produtos.csv` | `id;nome;descricao;preco;estoque;promocaoVip` |
+| `clientes.csv` | `id;nome;email;pontos;saldoCashback;vip` |
+| `cupons.csv` | `codigo;tipo;valor;dataValidade;clientesUtilizados` |
+| `pedidos.csv` | `id;clienteId;subtotal;desconto;totalFinal;formaPagamento;status;dataCriacao;cashbackGerado` |
+| `itens_pedidos.csv` | `pedidoId;produtoId;quantidade;precoUnitario` |
 
-* `main`: Codigo final homologado, estavel para entrega e apresentacao.
-* `developer`: Branch de integracao onde os Pull Requests das 5 branches individuais sao testados em conjunto.
-* `dev_joao`: Desenvolvimento das features atribuidas ao Joao.
-* `dev_vitoria`: Desenvolvimento das features atribuidas a Vitoria.
-* `dev_lucas`: Desenvolvimento das features atribuidas ao Lucas.
-* `dev_gabriel`: Desenvolvimento das features atribuidas ao Gabriel.
-* `dev_lavynne`: Desenvolvimento das features atribuidas a Lavynne.
+Na coluna `clientesUtilizados`, IDs são separados por vírgula. O leitor também aceita o cabeçalho antigo `codigo;tipo;valor;dataValidade;utilizado`: `false` não registra uso; `true` mantém o bloqueio global, pois o formato antigo não identifica o cliente. Na próxima gravação, o arquivo passa ao formato novo; o marcador `*` preserva esse bloqueio. Não há como recuperar usuários históricos apenas a partir de um booleano.
 
-### Cronograma Fatal:
-* **Terca (17/11):** Todos com o projeto rodando no IntelliJ IDEA e classes base de menu/validacoes.
-* **Quarta (18/11):** Conclusao das implementacoes individuais de cada uma das 5 branches.
-* **Quinta (19/11):** Abertura de Pull Requests para a branch `developer` e bateria de testes integrados conjuntos.
-* **Sexta-feira (20/11) [PRAZO FATAL]:** Finalizacao total do projeto, merge final na `main`, fechamento do relatorio tecnico (PDF 4+ paginas) e envio oficial.
-* **21 e 22/11:** Revisao final e ensaio da apresentacao oral.
-* **23 e 26/11:** Apresentacoes e defesas orais perante a banca.
+Produtos, pedidos e cupons criam arquivos ausentes; clientes são persistidos ao cadastrar ou salvar. Se o catálogo ou a lista de clientes estiver vazia, o `Main` insere exemplos. Clientes e cupons com erros de leitura bloqueiam regravações até correção e recarga. O leitor de produtos avisa e ignora linhas inválidas; portanto, corrija o arquivo antes de salvar para evitar perder registros rejeitados.
 
----
+## Testes reproduzíveis sem alterar os dados reais
 
-## 8. Documentacao Academica
+Execute em macOS/Linux, a partir da raiz. Os comandos criam uma cópia temporária do código e dos dados e deixam os resultados nessa cópia.
 
-* [Guia Geral da Equipe (PDF)](file:///home/joaomonteiro/Documents/Engenharia%20de%20Software/2%C2%B0%20Per%C3%ADodo/Programa%20Orientada%20a%20Objetos/ShopOnline/docs/Guia_Geral_Equipe_ShopOnline.pdf)
-* [Relatorio de Decisoes de Projeto](file:///home/joaomonteiro/Documents/Engenharia%20de%20Software/2%C2%B0%20Per%C3%ADodo/Programa%20Orientada%20a%20Objetos/ShopOnline/relatorio/relatorio-decisoes.md)
-* [Relatorio Tecnico da P2](file:///home/joaomonteiro/Documents/Engenharia%20de%20Software/2%C2%B0%20Per%C3%ADodo/Programa%20Orientada%20a%20Objetos/ShopOnline/relatorio/relatorio-tecnico.md)
-* [PDF de Divisao de Tarefas](file:///home/joaomonteiro/Documents/Engenharia%20de%20Software/2%C2%B0%20Per%C3%ADodo/Programa%20Orientada%20a%20Objetos/ShopOnline/docs/Divisao_Tarefas_P2.pdf)
+```bash
+pasta_teste=$(mktemp -d)
+cp -R src data "$pasta_teste/"
+(
+  cd "$pasta_teste" || exit 1
+  mkdir -p out
+  find src -name '*.java' -print0 | xargs -0 javac --release 17 -encoding UTF-8 -d out || exit 1
+  for arquivo in src/teste/Verificacao*.java; do
+    classe=${arquivo##*/}
+    classe=${classe%.java}
+    java -ea -cp out "teste.$classe" || exit 1
+  done
+)
+```
+
+A compilação e as **12 classes de verificação passaram em 21/11/2026**, com JDK 26.0.2.1 e compilação `--release 17`. Isso verifica compatibilidade de compilação com Java 17; não representa execução em uma JVM 17. `run.sh` também foi executado com sucesso.
+
+As verificações incluem 30 casos do módulo de carrinho/cupons, 26 do módulo de pedidos, 27 de integração de pedidos, 8 de produtos e 12 regressões das correções, além de cadastro, persistência, VIP e navegação. O teste do console executa o `Main` em processos separados e confirma compra com VIP, cupom, PIX e cashback, consulta após reinício e cancelamento com devolução ao estoque.
+
+## Limites conhecidos
+
+- O uso previsto é local, com uma instância do programa por vez. Escritas por arquivo temporário e compensações tratam falhas detectadas, mas os CSVs não formam uma transação atômica contra queda de energia ou gravação concorrente.
+- O cancelamento devolve estoque e muda o status. Na versão atual, não desfaz pontos, cashback gerado ou saldo resgatado; o cupom permanece utilizado. Essa política não foi detalhada nas imagens do enunciado e deve ser considerada ao demonstrar cancelamentos com benefícios.
+- A quantidade de parcelas do cartão não é persistida no histórico: ao reabrir, o pagamento é reconstruído com uma parcela; valor e tipo de pagamento são preservados.
+- O histórico dos itens guarda quantidade e preço de venda, mas depende do catálogo atual para nome/descrição e para reconstruir produtos. Não remova produtos ou clientes referenciados por pedidos.
+- Os pagamentos são simulados. Não há cobrança bancária, autenticação ou integração externa.
+
+## Equipe e fluxo de integração
+
+| Integrante | Frente acordada |
+| --- | --- |
+| João Guilherme Monteiro | Produtos, estoque, persistência base e arquitetura. |
+| Maria Vitória Salgado | Clientes, especialização VIP, validações e persistência de clientes. |
+| Lucas Silveira | Carrinho, cupons, promoções e persistência de cupons. |
+| Gabriel Buhatem | Pagamentos, pedidos, ciclo de status e cancelamento. |
+| Lavynne Marianne | Fidelidade, cashback, relatórios e organização do menu. |
+
+O fluxo combinado é branch individual, Pull Request para `developer` e integração validada em `main`. Esta documentação descreve os arquivos locais revisados; não afirma que as correções já foram publicadas ou integradas às branches remotas.
+
+## Documentação
+
+- [Relatório técnico editável](relatorio/relatorio-tecnico.md)
+- [Relatório técnico em PDF](relatorio/relatorio-tecnico.pdf)
+- [Decisões de projeto](relatorio/relatorio-decisoes.md)
+- [Guia original da equipe](docs/Guia_Geral_Equipe_ShopOnline.pdf)
+- [Divisão original de tarefas](docs/Divisao_Tarefas_P2.pdf)
+- [Checklist do módulo de produtos](docs/CHECKLIST_DEV_JOAO.md)
+
+O documento geral do professor, Trabalho P2.pdf, exige código-fonte no Git e relatório PDF com pelo menos quatro páginas no dia anterior à apresentação designada. O relatório deve incluir contribuição e experiência individual, funcionalidades implementadas e não concluídas com motivos, bibliotecas justificadas, referências e trecho ou screenshot de uma classe importante. Os relatos individuais dos cinco integrantes constam na seção 8 do relatório técnico. A recomendação de iText e o desafio de salvar dados no Google Drive não foram tratados como requisitos funcionais do ShopOnline.
+
+Os PDFs de planejamento registram a organização anterior da equipe e podem conter pendências ou cronogramas históricos. Para executar e consultar o comportamento desta versão, use este README e o relatório técnico atualizado.

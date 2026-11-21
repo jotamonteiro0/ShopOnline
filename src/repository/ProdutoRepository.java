@@ -4,6 +4,7 @@ import model.Produto;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.*;
 import java.util.*;
 
 public class ProdutoRepository implements Repositorio<Produto, String> {
@@ -34,8 +35,14 @@ public class ProdutoRepository implements Repositorio<Produto, String> {
         if (produto == null) {
             throw new IllegalArgumentException("Produto nao pode ser nulo.");
         }
-        produtos.put(produto.getId(), produto);
-        salvarNoArquivo();
+        Produto anterior = produtos.put(produto.getId(), produto);
+        try {
+            salvarNoArquivo();
+        } catch (RuntimeException erro) {
+            if (anterior == null) produtos.remove(produto.getId());
+            else produtos.put(produto.getId(), anterior);
+            throw erro;
+        }
     }
 
     @Override
@@ -43,7 +50,12 @@ public class ProdutoRepository implements Repositorio<Produto, String> {
         if (id == null) return false;
         Produto removido = produtos.remove(id.trim().toUpperCase());
         if (removido != null) {
-            salvarNoArquivo();
+            try {
+                salvarNoArquivo();
+            } catch (RuntimeException erro) {
+                produtos.put(removido.getId(), removido);
+                throw erro;
+            }
             return true;
         }
         return false;
@@ -94,23 +106,32 @@ public class ProdutoRepository implements Repositorio<Produto, String> {
 
     @Override
     public void salvarNoArquivo() {
-        File file = new File(caminhoArquivo);
-        File parent = file.getParentFile();
-        if (parent != null && !parent.exists()) {
-            parent.mkdirs();
-        }
-
-        try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8))) {
-            writer.write(CABECALHO);
-            writer.newLine();
-            for (Produto p : produtos.values()) {
-                writer.write(String.format(Locale.US, "%s;%s;%s;%.2f;%d;%b",
-                        p.getId(), p.getNome(), p.getDescricao(), p.getPreco(),
-                        p.getQuantidadeEstoque(), p.isPromocaoVip()));
+        Path destino = Path.of(caminhoArquivo).toAbsolutePath();
+        Path temporario = null;
+        try {
+            Files.createDirectories(destino.getParent());
+            temporario = Files.createTempFile(destino.getParent(), "produtos-", ".csv.tmp");
+            try (BufferedWriter writer = Files.newBufferedWriter(temporario, StandardCharsets.UTF_8)) {
+                writer.write(CABECALHO);
                 writer.newLine();
+                for (Produto p : produtos.values()) {
+                    writer.write(String.format(Locale.US, "%s;%s;%s;%.2f;%d;%b",
+                            p.getId(), p.getNome(), p.getDescricao(), p.getPreco(),
+                            p.getQuantidadeEstoque(), p.isPromocaoVip()));
+                    writer.newLine();
+                }
             }
-        } catch (IOException e) {
-            System.err.println("[ERRO REPOSITORY] Falha ao gravar produtos: " + e.getMessage());
+            try {
+                Files.move(temporario, destino, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+            } catch (AtomicMoveNotSupportedException erro) {
+                Files.move(temporario, destino, StandardCopyOption.REPLACE_EXISTING);
+            }
+        } catch (IOException erro) {
+            throw new UncheckedIOException("Falha ao gravar produtos.", erro);
+        } finally {
+            if (temporario != null) {
+                try { Files.deleteIfExists(temporario); } catch (IOException ignorado) { }
+            }
         }
     }
 }

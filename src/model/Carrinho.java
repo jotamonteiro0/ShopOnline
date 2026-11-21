@@ -13,9 +13,12 @@ public class Carrinho {
     }
 
     public void adicionarItem(Produto produto, int quantidade) {
+        if (produto == null || quantidade <= 0) {
+            throw new IllegalArgumentException("Produto e quantidade positiva obrigatorios.");
+        }
         for (ItemCarrinho item : itens) {
             if (item.getProduto().getId().equals(produto.getId())) {
-                item.setQuantidade(item.getQuantidade() + quantidade);
+                item.setQuantidade(Math.addExact(item.getQuantidade(), quantidade));
                 return;
             }
         }
@@ -24,6 +27,27 @@ public class Carrinho {
 
     public boolean removerItem(String produtoId) {
         return itens.removeIf(item -> item.getProduto().getId().equals(produtoId));
+    }
+
+    public boolean removerQuantidadeItem(String produtoId, int quantidadeParaRemover) {
+        if (produtoId == null || quantidadeParaRemover <= 0) {
+            return false;
+        }
+        for (int i = 0; i < itens.size(); i++) {
+            ItemCarrinho item = itens.get(i);
+            if (item.getProduto().getId().equalsIgnoreCase(produtoId.trim())) {
+                if (quantidadeParaRemover > item.getQuantidade()) {
+                    return false;
+                }
+                if (quantidadeParaRemover == item.getQuantidade()) {
+                    itens.remove(i);
+                } else {
+                    item.setQuantidade(item.getQuantidade() - quantidadeParaRemover);
+                }
+                return true;
+            }
+        }
+        return false;
     }
 
     public void limpar() {
@@ -64,6 +88,22 @@ public class Carrinho {
         return false;
     }
 
+    public boolean aplicarCupom(Cupom cupom, Cliente cliente) {
+        if (cupom != null && cliente != null && cupom.isValidoParaCliente(cliente.getId())) {
+            this.cupomAplicado = cupom;
+            return true;
+        }
+        return false;
+    }
+
+    public boolean removerCupom() {
+        if (cupomAplicado != null) {
+            cupomAplicado = null;
+            return true;
+        }
+        return false;
+    }
+
     public Cupom getCupomAplicado() {
         return cupomAplicado;
     }
@@ -76,7 +116,9 @@ public class Carrinho {
     }
 
     public double calcularTotal(Cliente cliente) {
-        double total = getSubtotal() - calcularDescontoVip(cliente) - calcularDescontoCupom();
+        double descontoCupom = cupomAplicado != null && cliente != null
+                && !cupomAplicado.isValidoParaCliente(cliente.getId()) ? 0 : calcularDescontoCupom();
+        double total = getSubtotal() - calcularDescontoVip(cliente) - descontoCupom;
         return Math.max(0.0, total);
     }
 }

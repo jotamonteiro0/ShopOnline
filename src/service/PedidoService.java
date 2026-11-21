@@ -83,10 +83,12 @@ public class PedidoService {
             // Compensacao para nao deixar um cancelamento parcial nas falhas detectaveis.
             for (int i = devolvidos.size() - 1; i >= 0; i--) {
                 ItemCarrinho item = devolvidos.get(i);
-                if (!estoqueService.darBaixaEstoque(item.getProduto().getId(), item.getQuantidade())) {
-                    falha.addSuppressed(new IllegalStateException(
-                            "Falha no rollback do estoque: " + item.getProduto().getId()));
-                }
+                try {
+                    if (!estoqueService.darBaixaEstoque(item.getProduto().getId(), item.getQuantidade())) {
+                        falha.addSuppressed(new IllegalStateException(
+                                "Falha no rollback do estoque: " + item.getProduto().getId()));
+                    }
+                } catch (RuntimeException erro) { falha.addSuppressed(erro); }
             }
             throw falha;
         }
