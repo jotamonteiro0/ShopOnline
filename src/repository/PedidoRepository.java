@@ -195,8 +195,20 @@ public class PedidoRepository implements Repositorio<Pedido, String> {
             }
         }
         // Gravacao por arquivo temporario reduz o risco de truncar o CSV por falha de escrita.
+        List<String> itensAnteriores;
+        try {
+            itensAnteriores = Files.readAllLines(arquivoItens, StandardCharsets.UTF_8);
+        } catch (IOException erro) {
+            throw new UncheckedIOException("Falha ao ler itens antes de atualizar pedidos.", erro);
+        }
         escreverArquivo(arquivoItens, linhasItens);
-        escreverArquivo(arquivoPedidos, linhasPedidos);
+        try {
+            escreverArquivo(arquivoPedidos, linhasPedidos);
+        } catch (RuntimeException erro) {
+            try { escreverArquivo(arquivoItens, itensAnteriores); }
+            catch (RuntimeException falha) { erro.addSuppressed(falha); }
+            throw erro;
+        }
     }
 
     private static void criarSeAusente(Path destino, String cabecalho) {

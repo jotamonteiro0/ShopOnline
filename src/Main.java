@@ -56,8 +56,13 @@ public class Main {
         carrinho.adicionarItem(produtoRepo.buscarPorId("P01"), 1);
         carrinho.adicionarItem(produtoRepo.buscarPorId("P02"), 1);
 
-        Cupom cupom = new Cupom("BEMVINDO10", TipoCupom.PERCENTUAL, 10.0, LocalDate.now().plusDays(30));
-        carrinho.aplicarCupom(cupom);
+        Cupom cupom = vendaService.getCupomRepository().buscarPorCodigo("BEMVINDO10");
+        if (cupom == null) {
+            cupom = new Cupom("BEMVINDO10", TipoCupom.PERCENTUAL, 10.0, LocalDate.now().plusDays(30));
+        }
+        if (!carrinho.aplicarCupom(cupom, clienteVip)) {
+            System.out.println("[Aviso] Cupom BEMVINDO10 indisponivel para este cliente; compra sem cupom.");
+        }
 
         FormaPagamento pagamentoPix = new PagamentoPix();
         Pedido pedido = vendaService.finalizarPedido("PED-" + UUID.randomUUID().toString().toUpperCase(), clienteVip, carrinho, pagamentoPix);

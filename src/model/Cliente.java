@@ -15,6 +15,10 @@ public class Cliente {
         this.id = validarTexto(id, "ID");
         setNome(nome);
         setEmail(email);
+        atualizarFidelidade(pontosFidelidade, saldoCashback);
+    }
+
+    public void atualizarFidelidade(int pontosFidelidade, double saldoCashback) {
         if (pontosFidelidade < 0) {
             throw new IllegalArgumentException("Pontos de fidelidade não podem ser negativos.");
         }

@@ -5,8 +5,9 @@ public class ItemCarrinho {
     private int quantidade;
 
     public ItemCarrinho(Produto produto, int quantidade) {
+        if (produto == null) throw new IllegalArgumentException("Produto obrigatorio.");
         this.produto = produto;
-        this.quantidade = quantidade;
+        setQuantidade(quantidade);
     }
 
     public Produto getProduto() {
@@ -18,6 +19,7 @@ public class ItemCarrinho {
     }
 
     public void setQuantidade(int quantidade) {
+        if (quantidade <= 0) throw new IllegalArgumentException("Quantidade deve ser positiva.");
         this.quantidade = quantidade;
     }
 
