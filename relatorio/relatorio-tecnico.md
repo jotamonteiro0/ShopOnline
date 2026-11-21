@@ -14,7 +14,7 @@ Professor: Samuel Oliveira | Revisão: 21 de novembro de 2026
 
 O ShopOnline é uma aplicação de console para gerenciar uma loja virtual. O programa cadastra produtos e clientes, monta carrinhos, aplica promoções, simula pagamentos e registra pedidos. Também acompanha estoque, níveis de fidelidade e créditos de cashback.
 
-O escopo funcional segue o enunciado do ShopOnline fornecido pelo professor em imagens: catálogo e estoque; carrinho e pedidos; cashback e pontuação; descontos VIP e cupons; pagamentos e relatórios. CSV, organização em camadas, testes sem bibliotecas externas e roteiro de demonstração são decisões da equipe para implementar e verificar esse escopo. Os guias antigos da equipe são documentos de planejamento, não substitutos do enunciado.
+O escopo funcional segue o enunciado do ShopOnline fornecido pelo professor em imagens: catálogo e estoque; carrinho e pedidos; cashback e pontuação; descontos VIP e cupons; pagamentos e relatórios. O documento geral Trabalho P2.pdf exige persistência em arquivos, README de execução, aplicação justificada de POO e relatório PDF com pelo menos quatro páginas. O formato CSV, a organização em camadas e os testes sem bibliotecas externas são decisões da equipe para cumprir e verificar essas exigências. Os guias antigos da equipe são documentos de planejamento, não substitutos do enunciado.
 
 ### Execução e ambiente
 
@@ -204,7 +204,48 @@ Não foram realizados testes no Windows, concorrência entre instâncias nem int
 
 ### Referências utilizadas
 
+- Trabalho P2.pdf, fornecido pelo professor: diretrizes gerais, apresentação e itens obrigatórios do relatório, especialmente páginas 3 e 4.
 - Enunciado do sistema ShopOnline fornecido pelo professor, apresentado em imagens nesta revisão.
 - Código-fonte e classes de verificação do projeto ShopOnline, revisados em 21/11/2026.
 - Guia_Geral_Equipe_ShopOnline.pdf e Divisao_Tarefas_P2.pdf: distribuição de frentes, organização da equipe e estrutura planejada para o relatório.
 - README.md e relatorio-decisoes.md atualizados para a mesma versão local.
+
+<!-- pagebreak -->
+
+## 7. Complementos exigidos no Trabalho P2.pdf
+
+### Bibliotecas e ferramentas utilizadas
+
+O programa utiliza a biblioteca padrão do Java: java.util para coleções e identificadores; java.time para datas e validade; java.io e java.nio para arquivos UTF-8; java.math.BigDecimal para arredondamento. A equipe escolheu essas APIs por serem suficientes para uma aplicação local e dispensarem dependências Java externas. O PDF acadêmico foi gerado com ReportLab e conferido com pypdf/pypdfium2; essas ferramentas de documentação não são dependências da aplicação. O iText é recomendado pelo professor, mas não imposto; o sistema apresenta os relatórios de vendas no console.
+
+### Trecho de uma classe importante: ClienteVip
+
+O trecho abaixo é parte do código atual de src/model/ClienteVip.java. Ele mostra o uso de super e a sobrescrita do método que aplica 10% somente em produtos promocionais. Os demais construtores e métodos foram omitidos neste recorte.
+
+```java
+public class ClienteVip extends Cliente {
+    private static final double DESCONTO_PROMOCAO_VIP = 0.10;
+
+    public ClienteVip(String id, String nome, String email) {
+        super(id, nome, email);
+    }
+
+    @Override
+    public double calcularDescontoVip(Produto produto) {
+        if (produto != null && produto.isPromocaoVip()) {
+            return produto.getPreco() * DESCONTO_PROMOCAO_VIP;
+        }
+        return 0.0;
+    }
+}
+```
+
+### Funcionalidades não implementadas e motivos
+
+O desafio de salvar os dados no Google Drive não foi implementado: a solução adotada usa arquivos locais e não inclui autenticação ou integração com nuvem. A exportação do relatório gerencial em PDF também não foi implementada; o resumo de vendas é apresentado no console, e o PDF entregue é o relatório acadêmico. A reversão de benefícios no cancelamento e o registro das parcelas permanecem como limitações técnicas, conforme seção 4, e dependem de extensão da política e do formato de persistência.
+
+### Experiência individual e entrega
+
+A seção 5 registra a divisão de responsabilidades. O relato pessoal de cada aluno sobre o que mais gostou, dificuldades e aprendizado ainda precisa ser fornecido pelos próprios integrantes; esta revisão não atribui depoimentos pessoais a eles. Esse item obrigatório está pendente de preenchimento antes do envio acadêmico. A avaliação técnica coletiva está descrita na seção 5.
+
+O professor pede disponibilizar o repositório com código-fonte e o relatório final em PDF no dia anterior à apresentação designada. As datas previstas são 23 e 26 de novembro; o dia específico da equipe deve seguir o cronograma da disciplina. Não é necessário entregar executável binário.

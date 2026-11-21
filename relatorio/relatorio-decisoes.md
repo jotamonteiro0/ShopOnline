@@ -1,6 +1,6 @@
 # Decisões de projeto - ShopOnline
 
-Revisão: 21/11/2026. Este registro descreve a implementação local e complementa o [relatório técnico](relatorio-tecnico.md). Os requisitos funcionais de referência são os apresentados nas imagens do enunciado do ShopOnline. A divisão em camadas, os arquivos CSV e o formato dos testes são decisões da equipe.
+Revisão: 21/11/2026. Este registro descreve a implementação local e complementa o [relatório técnico](relatorio-tecnico.md). Os requisitos funcionais de referência são os apresentados nas imagens do enunciado do ShopOnline. O documento geral Trabalho P2.pdf exige persistência em arquivos e README. A divisão em camadas, a escolha do formato CSV e o formato dos testes são decisões da equipe.
 
 ## 1. Console e biblioteca padrão
 
