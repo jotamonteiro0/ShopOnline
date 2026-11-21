@@ -246,15 +246,13 @@ O desafio de salvar os dados no Google Drive não foi implementado: a solução 
 
 ### Organização da entrega
 
-A seção 5 registra a divisão de responsabilidades e a avaliação técnica coletiva. Os relatos individuais e a identificação de suas fontes estão na seção 8.
+A seção 5 registra a divisão de responsabilidades e a avaliação técnica coletiva. Os relatos individuais estão na seção 8.
 
 O professor pede disponibilizar o repositório com código-fonte e o relatório final em PDF no dia anterior à apresentação designada. As datas previstas são 23 e 26 de novembro; o dia específico da equipe deve seguir o cronograma da disciplina. Não é necessário entregar executável binário.
 
 <!-- pagebreak -->
 
 ## 8. Experiências individuais
-
-Os textos de João e Maria Vitória foram redigidos a partir das informações fornecidas nesta revisão. Os textos de Lucas, Gabriel e Lavynne são propostas baseadas nas responsabilidades de cada módulo e devem ser validados pelos respectivos integrantes antes do envio acadêmico.
 
 ### João Guilherme Monteiro
 
@@ -264,14 +262,14 @@ Gostei de organizar as tarefas e acompanhar como as partes do projeto se conecta
 
 Gostei de revisar meu código e o dos meus colegas, porque isso me ajudou a entender o funcionamento do sistema além da minha parte. Minha maior dificuldade foi organizar a lógica de integração de cada classe: compreender quem deveria chamar cada método e como uma alteração afetava os outros módulos. Com as revisões e os testes, aprendi a identificar melhor as responsabilidades das classes e a importância de verificar o fluxo completo, além de cada classe isoladamente.
 
-### Lucas Silveira - proposta de relato
+### Lucas Silveira
 
 Gostei de trabalhar com o carrinho e ver os itens e descontos formando o total da compra. A parte mais desafiadora foi combinar desconto VIP e cupom sem gerar valores incorretos, além de controlar validade e uso único por cliente. Essa experiência ajudou a compreender melhor o uso de coleções, as validações e a separação entre o cálculo do carrinho e a persistência dos cupons. Os testes mostraram a importância de verificar situações além da compra mais simples.
 
-### Gabriel Buhatem - proposta de relato
+### Gabriel Buhatem
 
 Gostei de aplicar polimorfismo nas formas de pagamento e acompanhar o ciclo dos pedidos. O maior desafio foi relacionar a mudança de status com o cancelamento e a devolução dos produtos ao estoque, mantendo os registros consistentes. Aprendi mais sobre contratos definidos por interfaces e sobre a diferença entre alterar um objeto em memória e persistir essa mudança. Testar o comportamento após reiniciar o programa também ajudou a entender a importância do histórico dos pedidos.
 
-### Lavynne Marianne - proposta de relato
+### Lavynne Marianne
 
 Gostei de transformar as regras de fidelidade em pontos, níveis e créditos que o cliente pode usar em outra compra. A maior dificuldade foi acompanhar a ordem dos cálculos e integrar cashback, descontos e relatórios ao fluxo do sistema. Aprendi a usar enumerações para representar os níveis e a conferir os valores com exemplos e testes. A integração também mostrou como combinar as regras de diferentes módulos exige comunicação e uma divisão clara de responsabilidades.
