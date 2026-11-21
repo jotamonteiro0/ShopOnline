@@ -11,12 +11,11 @@ import service.VendaService;
 import java.time.LocalDate;
 
 public class MenuPrincipal {
-    private final EstoqueService estoqueService;
     private final ClienteRepository clienteRepo;
     private final ProdutoRepository produtoRepo;
-    private final FidelidadeService fidelidadeService;
     private final VendaService vendaService;
     private final MenuProdutos menuProdutos;
+    private final MenuCarrinho menuCarrinho;
 
     public MenuPrincipal(ProdutoRepository produtoRepo,
                          ClienteRepository clienteRepo,
@@ -25,10 +24,10 @@ public class MenuPrincipal {
                          VendaService vendaService) {
         this.produtoRepo = produtoRepo;
         this.clienteRepo = clienteRepo;
-        this.estoqueService = estoqueService;
-        this.fidelidadeService = fidelidadeService;
         this.vendaService = vendaService;
         this.menuProdutos = new MenuProdutos(estoqueService);
+        this.menuCarrinho = new MenuCarrinho(produtoRepo, clienteRepo, vendaService.getCupomRepository(),
+                estoqueService, vendaService);
     }
 
     public void iniciar() {
@@ -51,8 +50,8 @@ public class MenuPrincipal {
             switch (opcao) {
                 case 1 -> menuProdutos.exibirMenu();
                 case 2 -> new MenuClientes(clienteRepo).exibirMenu();
-                case 3 -> menuCarrinhoInfo();
-                case 4 -> menuPedidosInfo();
+                case 3 -> menuCarrinho.exibirMenu();
+                case 4 -> new MenuPedidos(vendaService).exibirMenu();
                 case 5 -> menuFidelidadeInfo();
                 case 6 -> executarDemonstracao();
                 case 0 -> {
@@ -61,26 +60,6 @@ public class MenuPrincipal {
                 }
             }
         }
-    }
-
-    private void menuCarrinhoInfo() {
-        System.out.println("\n==================================================");
-        System.out.println("        MODULO: CARRINHO E CUPONS DE DESCONTO     ");
-        System.out.println("             Responsavel: Lucas Silveira (dev_lucas) ");
-        System.out.println("==================================================");
-        System.out.println("[Informacao] O gerenciador de carrinho interativo e validacao");
-        System.out.println("de cupons por cliente estao em desenvolvimento na branch dev_lucas.");
-        Entrada.aguardarEnter();
-    }
-
-    private void menuPedidosInfo() {
-        System.out.println("\n==================================================");
-        System.out.println("      MODULO: PAGAMENTOS E CICLO DE PEDIDOS       ");
-        System.out.println("            Responsavel: Gabriel Buhatem (dev_gabriel)");
-        System.out.println("==================================================");
-        System.out.println("[Informacao] As rotinas de avanco logistico e cancelamento");
-        System.out.println("restrito com estorno estao em desenvolvimento na branch dev_gabriel.");
-        Entrada.aguardarEnter();
     }
 
     private void menuFidelidadeInfo() {
@@ -129,8 +108,13 @@ public class MenuPrincipal {
         carrinho.adicionarItem(pGamer, 1);
         carrinho.adicionarItem(pMouse, 1);
 
-        Cupom cupom = new Cupom("BEMVINDO10", TipoCupom.PERCENTUAL, 10.0, LocalDate.now().plusDays(30));
-        carrinho.aplicarCupom(cupom);
+        Cupom cupom = vendaService.getCupomRepository().buscarPorCodigo("BEMVINDO10");
+        if (cupom == null) {
+            cupom = new Cupom("BEMVINDO10", TipoCupom.PERCENTUAL, 10.0, LocalDate.now().plusDays(30));
+        }
+        if (!carrinho.aplicarCupom(cupom, clienteVip)) {
+            System.out.println("[Aviso] Cupom BEMVINDO10 indisponivel para este cliente; compra sem cupom.");
+        }
 
         System.out.println("Cliente: " + clienteVip.getNome() + " (VIP)");
         System.out.printf("Subtotal: R$ %.2f%n", carrinho.getSubtotal());
@@ -142,7 +126,7 @@ public class MenuPrincipal {
 
         boolean usarCashback = clienteVip.getSaldoCashback() > 0
                 && Entrada.lerConfirmacao("Deseja usar o cashback nesta compra?");
-        Pedido pedido = vendaService.finalizarPedido("PED-" + System.currentTimeMillis() % 10000, clienteVip, carrinho, pagamentoPix, usarCashback);
+        Pedido pedido = vendaService.finalizarPedido("PED-" + java.util.UUID.randomUUID(), clienteVip, carrinho, pagamentoPix, usarCashback);
 
         System.out.println("\nPedido Finalizado:");
         System.out.println("  " + pedido);

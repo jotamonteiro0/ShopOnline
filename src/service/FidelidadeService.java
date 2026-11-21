@@ -27,12 +27,12 @@ public class FidelidadeService {
         int pontosGanhos = calcularPontosGanhos(valorCompra);
         double cashbackGanho = calcularCashback(cliente, valorCompra);
 
-        cliente.adicionarPontos(pontosGanhos);
-        cliente.creditarCashback(cashbackGanho);
-
+        cliente.atualizarFidelidade(Math.addExact(cliente.getPontosFidelidade(), pontosGanhos),
+                arredondarCentavos(cliente.getSaldoCashback() + cashbackGanho));
         clienteRepository.salvar(cliente);
     }
-    public double usarCashback(Cliente cliente, double valorCompra) {
+
+    public double calcularResgateCashback(Cliente cliente, double valorCompra) {
         if (!Double.isFinite(valorCompra) || valorCompra < 0) {
             throw new IllegalArgumentException("Valor da compra inválido.");
         }
@@ -42,11 +42,16 @@ public class FidelidadeService {
             return 0.0;
         }
 
-        double credito = arredondarCentavos(Math.min(saldo, valorCompra));
-        if (credito <= 0 || !cliente.debitarCashback(Math.min(credito, saldo))) {
+        return Math.min(saldo, valorCompra);
+    }
+
+    public double usarCashback(Cliente cliente, double valorCompra) {
+        double credito = calcularResgateCashback(cliente, valorCompra);
+        if (credito <= 0) {
             return 0.0;
         }
-
+        cliente.atualizarFidelidade(cliente.getPontosFidelidade(),
+                arredondarCentavos(cliente.getSaldoCashback() - credito));
         clienteRepository.salvar(cliente);
         return credito;
     }

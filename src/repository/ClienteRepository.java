@@ -26,6 +26,10 @@ public class ClienteRepository {
         return clientes.get(id);
     }
 
+    public Path getCaminhoArquivo() {
+        return Path.of(caminhoArquivo);
+    }
+
     public void cadastrar(Cliente cliente) {
         if (cliente == null) {
             throw new IllegalArgumentException("Cliente não pode ser nulo.");

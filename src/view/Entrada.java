@@ -51,7 +51,7 @@ public class Entrada {
             String entrada = scanner.nextLine().trim().replace(',', '.');
             try {
                 double valor = Double.parseDouble(entrada);
-                if (valor >= min) {
+                if (Double.isFinite(valor) && valor >= min) {
                     return valor;
                 }
                 System.out.printf("  [Aviso] O valor deve ser maior ou igual a %.2f.%n", min);

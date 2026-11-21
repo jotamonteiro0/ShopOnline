@@ -28,14 +28,18 @@ public class MenuProdutos {
             System.out.println("--------------------------------------------------");
 
             int opcao = Entrada.lerInteiro("Escolha uma opcao: ", 0, 6);
-            switch (opcao) {
-                case 1 -> cadastrarProduto();
-                case 2 -> listarProdutos();
-                case 3 -> consultarPorId();
-                case 4 -> reporEstoque();
-                case 5 -> listarAlertas();
-                case 6 -> exibirResumoInventario();
-                case 0 -> voltar = true;
+            try {
+                switch (opcao) {
+                    case 1 -> cadastrarProduto();
+                    case 2 -> listarProdutos();
+                    case 3 -> consultarPorId();
+                    case 4 -> reporEstoque();
+                    case 5 -> listarAlertas();
+                    case 6 -> exibirResumoInventario();
+                    case 0 -> voltar = true;
+                }
+            } catch (RuntimeException erro) {
+                System.out.println("[Erro] Nao foi possivel salvar a alteracao: " + erro.getMessage());
             }
         }
     }

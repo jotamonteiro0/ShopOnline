@@ -32,7 +32,12 @@ public class EstoqueService {
 
         Produto produto = produtoRepository.buscarPorId(produtoId);
         if (produto != null && produto.reduzirEstoque(quantidade)) {
-            produtoRepository.salvar(produto);
+            try {
+                produtoRepository.salvar(produto);
+            } catch (RuntimeException erro) {
+                produto.adicionarEstoque(quantidade);
+                throw erro;
+            }
             if (produto.precisaReposicao()) {
                 System.out.printf(">>> [ALERTA DE REPOSICAO] O produto '%s' (ID: %s) esta com estoque baixo: apenas %d unidades restantes!%n",
                         produto.getNome(), produto.getId(), produto.getQuantidadeEstoque());
@@ -50,8 +55,14 @@ public class EstoqueService {
 
         Produto produto = produtoRepository.buscarPorId(produtoId);
         if (produto != null) {
-            produto.adicionarEstoque(quantidade);
-            produtoRepository.salvar(produto);
+            int anterior = produto.getQuantidadeEstoque();
+            produto.setQuantidadeEstoque(Math.addExact(anterior, quantidade));
+            try {
+                produtoRepository.salvar(produto);
+            } catch (RuntimeException erro) {
+                produto.setQuantidadeEstoque(anterior);
+                throw erro;
+            }
             return true;
         }
         return false;
